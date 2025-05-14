@@ -8,8 +8,22 @@ body {
   align-items: center;
   height: 100vh;
   background-color: #f4f4f9;
+  flex-direction: column;
 }
 
+/* Stile für das Logo */
+header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  max-width: 200px;
+  height: auto;
+}
+
+/* Formular-Design */
 h1, h2 {
   color: #333;
 }
@@ -21,6 +35,7 @@ form {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 300px;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 input, textarea, button {
@@ -42,8 +57,10 @@ button:hover {
   background-color: #45a049;
 }
 
+/* Bereich für eingeloggte Benutzer */
 #loggedInArea {
   display: none;
+  text-align: center;
 }
 
 ul {
@@ -56,4 +73,9 @@ ul li {
   padding: 10px;
   background-color: #f9f9f9;
   border-radius: 4px;
+}
+
+/* Fehlernachricht */
+#errorMessage {
+  color: red;
 }
