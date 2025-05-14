@@ -1,92 +1,59 @@
+/* Allgemeine Stile */
 body {
+  font-family: Arial, sans-serif;
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #f5f7fa;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f9;
+}
+
+h1, h2 {
   color: #333;
 }
 
-.container {
-  max-width: 960px;
-  margin: auto;
+form {
+  background-color: #fff;
   padding: 20px;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.logo {
-  width: 80px;
-  margin-bottom: 10px;
-}
-
-h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
-.card {
-  background: white;
-  padding: 1rem;
   border-radius: 8px;
-  margin-bottom: 2rem;
-  box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  margin-bottom: 20px;
 }
 
-input, button {
+input, textarea, button {
   width: 100%;
   padding: 10px;
-  margin: 0.5rem 0;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #3b82f6;
+  background-color: #4CAF50;
   color: white;
   border: none;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #2563eb;
+  background-color: #45a049;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  background: #edf2f7;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 5px;
-}
-
-.flex-columns {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.flex-columns .card {
-  flex: 1;
-  min-width: 300px;
-}
-
-.hidden {
+#loggedInArea {
   display: none;
 }
 
-.profile-header {
-  display: flex;
-  justify-content: space-between;
-  background: #e2e8f0;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 20px;
+ul {
+  list-style-type: none;
+  padding-left: 0;
 }
 
+ul li {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
