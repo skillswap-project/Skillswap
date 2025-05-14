@@ -1,6 +1,6 @@
 // Deine Supabase URL und Anonymer API-Schlüssel
 const SUPABASE_URL = 'https://hmqzpwvofjvrlvkjwvgf.supabase.co';
-const SUPABASE_ANON_KEY = 'dein-anonymer-api-schlüssel';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtcXpwd3ZvZmp2cmx2a2p3dmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMjQ5MzksImV4cCI6MjA2MjgwMDkzOX0.RxhzSRQ4MC_McVrBvS2o2WyPyFegidWwnN5N6m8qXF8';
 
 // Supabase Initialisierung
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
