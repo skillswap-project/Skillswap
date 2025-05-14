@@ -1,45 +1,111 @@
 // Deine Supabase URL und Anonymer API-Schlüssel
 const SUPABASE_URL = 'https://hmqzpwvofjvrlvkjwvgf.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtcXpwd3ZvZmp2cmx2a2p3dmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMjQ5MzksImV4cCI6MjA2MjgwMDkzOX0.RxhzSRQ4MC_McVrBvS2o2WyPyFegidWwnN5N6m8qXF8';
+const SUPABASE_ANON_KEY = 'dein-anonymer-api-schlüssel';
 
 // Supabase Initialisierung
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Das Formular und die Felder für die Benutzerregistrierung
+// DOM-Elemente für das Formular und die Anzeige
 const signupForm = document.getElementById('signupForm');
-const emailField = document.getElementById('email');
-const passwordField = document.getElementById('password');
+const loginForm = document.getElementById('loginForm');
+const offerServiceForm = document.getElementById('offerServiceForm');
 const errorMessage = document.getElementById('errorMessage');
+const loggedInArea = document.getElementById('loggedInArea');
+const loggedOutArea = document.getElementById('loggedOutArea');
+const serviceList = document.getElementById('serviceList');
 
-// Formularverarbeitung
+// Registrierungsfunktion
 signupForm.addEventListener('submit', async (event) => {
-  event.preventDefault(); // Verhindert das automatische Absenden des Formulars
-
-  // Die E-Mail und das Passwort aus den Formularfeldern holen
-  const email = emailField.value;
-  const password = passwordField.value;
-
-  // Fehlernachricht zurücksetzen
-  errorMessage.textContent = '';
+  event.preventDefault();
+  const email = document.getElementById('signupEmail').value;
+  const password = document.getElementById('signupPassword').value;
 
   try {
-    // Registrierung über Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-    });
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
-    // Fehlerbehandlung
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
-    // Erfolgreiche Registrierung
-    alert('Registrierung erfolgreich! Bitte überprüfe deine E-Mails, um den Account zu bestätigen.');
-    console.log('Erfolgreiche Registrierung:', data);
+    alert('Registrierung erfolgreich! Bitte bestätige deine E-Mail.');
   } catch (error) {
-    // Fehler im Falle eines Fehlers
     errorMessage.textContent = `Fehler: ${error.message}`;
-    console.error('Fehler bei der Registrierung:', error);
   }
 });
+
+// Login-Funktion
+loginForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+
+    // Benutzer erfolgreich eingeloggt, zeige Profilbereich
+    loggedInArea.style.display = 'block';
+    loggedOutArea.style.display = 'none';
+    fetchServices(); // Lade Dienstleistungen des Nutzers
+  } catch (error) {
+    errorMessage.textContent = `Fehler: ${error.message}`;
+  }
+});
+
+// Dienstleistung hinzufügen
+offerServiceForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const serviceName = document.getElementById('serviceName').value;
+  const serviceDescription = document.getElementById('serviceDescription').value;
+
+  try {
+    const user = supabase.auth.user();
+    if (!user) throw new Error('Du musst eingeloggt sein, um einen Service anzubieten.');
+
+    // Dienstleistung in der "services"-Tabelle speichern
+    const { data, error } = await supabase
+      .from('services')
+      .insert([{ user_id: user.id, name: serviceName, description: serviceDescription }]);
+
+    if (error) throw error;
+
+    alert('Dienstleistung erfolgreich hinzugefügt!');
+    fetchServices(); // Lade die Dienstleistungen nach der Hinzufügung
+  } catch (error) {
+    errorMessage.textContent = `Fehler: ${error.message}`;
+  }
+});
+
+// Dienstleistungen des Nutzers abrufen
+async function fetchServices() {
+  try {
+    const user = supabase.auth.user();
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
+      .eq('user_id', user.id);
+
+    if (error) throw error;
+
+    // Dienstleistungsliste anzeigen
+    serviceList.innerHTML = '';
+    data.forEach((service) => {
+      const li = document.createElement('li');
+      li.textContent = `${service.name}: ${service.description}`;
+      serviceList.appendChild(li);
+    });
+  } catch (error) {
+    errorMessage.textContent = `Fehler beim Abrufen der Dienstleistungen: ${error.message}`;
+  }
+}
+
+// Benutzer abmelden
+async function logout() {
+  await supabase.auth.signOut();
+  loggedInArea.style.display = 'none';
+  loggedOutArea.style.display = 'block';
+}
