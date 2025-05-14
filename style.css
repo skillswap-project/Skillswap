@@ -1,19 +1,14 @@
-/* Allgemeine Stile */
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
   background-color: #f4f4f9;
+  margin: 0;
+  padding: 20px;
+  display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-/* Stile für das Logo */
 header {
-  width: 100%;
   text-align: center;
   margin-bottom: 20px;
 }
@@ -23,33 +18,29 @@ header {
   height: auto;
 }
 
-/* Formular-Design */
-h1, h2 {
-  color: #333;
-}
-
 form {
-  background-color: #fff;
+  background: white;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 300px;
   margin-bottom: 20px;
-  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 300px;
 }
 
 input, textarea, button {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin-top: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button {
   background-color: #4CAF50;
   color: white;
-  border: none;
+  font-weight: bold;
   cursor: pointer;
 }
 
@@ -57,9 +48,9 @@ button:hover {
   background-color: #45a049;
 }
 
-/* Bereich für eingeloggte Benutzer */
-#loggedInArea {
-  display: none;
+#errorMessage {
+  color: red;
+  margin: 10px 0;
   text-align: center;
 }
 
@@ -69,13 +60,9 @@ ul {
 }
 
 ul li {
-  margin: 10px 0;
+  background: #fff;
   padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 4px;
-}
-
-/* Fehlernachricht */
-#errorMessage {
-  color: red;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
