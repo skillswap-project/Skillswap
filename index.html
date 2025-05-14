@@ -2,28 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SkillSwap – Fähigkeiten tauschen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
 
-    <!-- Logo -->
     <header>
       <img src="logo.png" alt="SkillSwap Logo" class="logo" />
       <h1>SkillSwap</h1>
-      <p>Tausche deine Fähigkeiten mit anderen!</p>
+      <p>Dienstleistungen tauschen – Mathe gegen Gitarre!</p>
     </header>
 
-    <!-- Auth Bereich -->
+    <!-- 🔐 Login/Signup -->
     <section id="auth-section">
       <div class="card">
         <h2>Login</h2>
         <form id="login-form">
           <input type="email" id="email" placeholder="E-Mail" required />
           <input type="password" id="password" placeholder="Passwort" required />
-          <button type="submit">Login</button>
+          <button type="submit">Einloggen</button>
         </form>
       </div>
 
@@ -37,7 +36,7 @@
       </div>
     </section>
 
-    <!-- App Bereich -->
+    <!-- 🧑 Eingeloggter Bereich -->
     <section id="app-section" class="hidden">
       <div class="profile-header">
         <span>Angemeldet als: <strong id="username-display">...</strong></span>
@@ -45,28 +44,24 @@
       </div>
 
       <div class="flex-columns">
-        <!-- Angebote -->
         <div class="card">
-          <h2>Angebot erstellen</h2>
+          <h2>Angebot hinzufügen</h2>
           <form id="offer-form">
             <input type="text" id="offer-skill" placeholder="Was bietest du an?" required />
-            <input type="text" id="offer-description" placeholder="Beschreibung (optional)" />
-            <button type="submit">Angebot hinzufügen</button>
+            <input type="text" id="offer-description" placeholder="Beschreibung" />
+            <button type="submit">Speichern</button>
           </form>
-
           <h3>Alle Angebote</h3>
           <ul id="offers-list"></ul>
         </div>
 
-        <!-- Gesuche -->
         <div class="card">
-          <h2>Gesuch erstellen</h2>
+          <h2>Gesuch hinzufügen</h2>
           <form id="need-form">
             <input type="text" id="need-skill" placeholder="Was suchst du?" required />
-            <input type="text" id="need-description" placeholder="Beschreibung (optional)" />
-            <button type="submit">Gesuch hinzufügen</button>
+            <input type="text" id="need-description" placeholder="Beschreibung" />
+            <button type="submit">Speichern</button>
           </form>
-
           <h3>Alle Gesuche</h3>
           <ul id="needs-list"></ul>
         </div>
