@@ -2,54 +2,27 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dienstleistungen Tauschen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meine Supabase App</title>
   <link rel="stylesheet" href="style.css" />
+  <script defer src="script.js"></script>
 </head>
 <body>
-
-  <!-- Logo -->
-  <header>
+  <div class="container">
     <img src="logo.png" alt="Logo" class="logo" />
-  </header>
-
-  <!-- Nicht eingeloggt -->
-  <div id="loggedOutArea">
-    <h1>Registrierung</h1>
-    <form id="signupForm">
-      <input type="email" id="signupEmail" placeholder="E-Mail" required />
-      <input type="password" id="signupPassword" placeholder="Passwort" required />
-      <button type="submit">Registrieren</button>
-    </form>
-
-    <h1>Login</h1>
-    <form id="loginForm">
-      <input type="email" id="loginEmail" placeholder="E-Mail" required />
-      <input type="password" id="loginPassword" placeholder="Passwort" required />
-      <button type="submit">Einloggen</button>
-    </form>
-
-    <p id="errorMessage"></p>
+    
+    <div class="auth">
+      <h2>Anmelden / Registrieren</h2>
+      <input type="email" id="email" placeholder="E-Mail" />
+      <input type="password" id="password" placeholder="Passwort" />
+      
+      <div class="buttons">
+        <button id="loginBtn">Login</button>
+        <button id="signupBtn">Registrieren</button>
+      </div>
+      
+      <div id="message"></div>
+    </div>
   </div>
-
-  <!-- Eingeloggt -->
-  <div id="loggedInArea" style="display: none;">
-    <h1>Willkommen!</h1>
-    <button onclick="logout()">Abmelden</button>
-
-    <h2>Deine Dienstleistungen</h2>
-    <ul id="serviceList"></ul>
-
-    <h2>Dienstleistung hinzufügen</h2>
-    <form id="offerServiceForm">
-      <input type="text" id="serviceName" placeholder="Titel" required />
-      <textarea id="serviceDescription" placeholder="Beschreibung" required></textarea>
-      <button type="submit">Hinzufügen</button>
-    </form>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="script.js"></script>
 </body>
 </html>
-
