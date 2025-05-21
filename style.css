@@ -1,3 +1,4 @@
+/* Allgemein */
 body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
@@ -6,10 +7,11 @@ body {
   color: #333;
 }
 
+/* Header */
 header {
   background: #1d4ed8;
   color: white;
-  padding: 1em;
+  padding: 1em 2em;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,55 +21,83 @@ header img {
   height: 40px;
 }
 
+h1 {
+  margin: 0;
+}
+
+/* Hauptbereich */
 main {
-  max-width: 600px;
+  max-width: 700px;
   margin: 2em auto;
   padding: 2em;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
+/* Abschnitte */
 section {
   margin-bottom: 2em;
 }
 
 h2 {
-  margin-bottom: 1em;
   color: #1d4ed8;
+  margin-bottom: 1em;
+  text-align: center;
 }
 
+/* Eingabefelder */
 input {
   width: 100%;
   padding: 0.75em;
-  margin-bottom: 1em;
+  margin: 0.5em 0;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1em;
+  box-sizing: border-box;
 }
 
+/* Buttons */
 button {
   padding: 0.75em 1.5em;
+  margin-top: 1em;
   background: #1d4ed8;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-size: 1em;
+  transition: background 0.2s ease;
 }
 
 button:hover {
   background: #1e40af;
 }
 
-.hidden {
-  display: none;
+/* Button-Gruppe bei Auth */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1em;
 }
 
+/* Auth-Box */
+#auth-section {
+  background: #f9fafb;
+  padding: 2em;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+}
+
+/* Ergebnisliste */
 #results {
   margin-top: 1em;
 }
 
+/* Profilkarten */
 .profile-card {
   background: #f9fafb;
   border: 1px solid #ddd;
@@ -84,4 +114,9 @@ button:hover {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Hilfsklasse */
+.hidden {
+  display: none;
 }
