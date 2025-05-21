@@ -36,7 +36,10 @@ async function saveProfile() {
   const name = document.getElementById('name').value;
   const age = parseInt(document.getElementById('age').value);
   const location = document.getElementById('location').value;
-  const talents = document.getElementById('talents').value.split(',').map(t => t.trim());
+  const talents = document.getElementById('talents').value
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(t => t.length > 0);
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabase.from('profiles').upsert({
@@ -100,10 +103,19 @@ function previewAvatar() {
   }
 }
 
-// Talente suchen
+// Benutzer mit passenden Talenten finden (mehrfach-Suche möglich)
 async function searchUsers() {
-  const term = document.getElementById('search-term').value.toLowerCase().trim();
-  const { data, error } = await supabase.from('profiles').select('*').contains('talents', [term]);
+  const terms = document.getElementById('search-term').value
+    .toLowerCase()
+    .split(',')
+    .map(t => t.trim())
+    .filter(t => t.length > 0);
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .overlaps('talents', terms);
+
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
 
@@ -124,25 +136,25 @@ async function searchUsers() {
   });
 }
 
-// Ansicht umschalten
+// Ansicht wechseln zwischen Profil und Suche
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
 }
 
-// Chip aktivieren/deaktivieren
+// Chips aktivieren/deaktivieren
 function toggleTalent(element) {
   element.classList.toggle('active');
   updateHiddenTalentField();
 }
 
-// Alle aktiven Chips → verstecktes Feld aktualisieren
+// Verstecktes Feld mit aktiven Talenten aktualisieren
 function updateHiddenTalentField() {
   const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Neues Talent-Chip per Eingabe hinzufügen
+// Neues Talent als Chip & DB-Eintrag hinzufügen
 async function checkNewTalent(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -165,14 +177,14 @@ async function checkNewTalent(event) {
     try {
       await supabase.from('talent_tags').insert({ name: talent });
     } catch (e) {
-      // z. B. duplicate key – ignorieren
+      // Fehler ignorieren (z. B. bereits vorhanden)
     }
 
     updateHiddenTalentField();
   }
 }
 
-// Avatar-Datei hochladen → Supabase Storage
+// Avatar-Datei in Supabase Storage hochladen
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
   const file = fileInput.files[0];
@@ -198,7 +210,7 @@ async function uploadAvatar() {
   previewAvatar();
 }
 
-// Talente aus der DB laden und als Chips anzeigen
+// Alle Chips aus der talent_tags-Tabelle laden
 async function loadTalentChips() {
   const { data, error } = await supabase.from('talent_tags').select('*').order('name');
   const chipContainer = document.getElementById('chip-container');
