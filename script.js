@@ -1,7 +1,7 @@
 // Supabase initialisieren – ersetze durch deine echten Keys!
 const supabase = window.supabase.createClient(
-  'https://hmqzpwvofjvrlvkjwvgf.supabase.co',     // z. B. https://abcd1234.supabase.co
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtcXpwd3ZvZmp2cmx2a2p3dmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMjQ5MzksImV4cCI6MjA2MjgwMDkzOX0.RxhzSRQ4MC_McVrBvS2o2WyPyFegidWwnN5N6m8qXF8'                            // z. B. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  'https://jdabagmcyxjjrknqrgkh.supabase.co',     // z. B. https://abcd1234.supabase.co
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'                            // z. B. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 );
 
 // Registrierung
