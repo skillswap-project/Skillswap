@@ -7,6 +7,7 @@ const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 const email = document.getElementById("email");
 const password = document.getElementById("password");
 const loginBtn = document.getElementById("login-btn");
+const registerBtn = document.getElementById("register-btn");
 const logoutBtn = document.getElementById("logout-btn");
 
 const authSection = document.getElementById("auth-section");
@@ -24,39 +25,46 @@ const searchBtn = document.getElementById("search-btn");
 const searchInput = document.getElementById("search-skill");
 const resultsDiv = document.getElementById("results");
 
-// Login oder Registrierung
+// Login
 loginBtn.addEventListener("click", async () => {
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error } = await client.auth.signInWithPassword({
     email: email.value,
     password: password.value,
   });
 
   if (error) {
-    // Falls Nutzer noch nicht existiert → registrieren
-    const { error: signupError } = await supabase.auth.signUp({
-      email: email.value,
-      password: password.value,
-    });
-    if (signupError) {
-      alert("Fehler bei Registrierung: " + signupError.message);
-    }
+    alert("Login fehlgeschlagen: " + error.message);
+  } else {
+    checkAuth();
   }
+});
 
-  checkAuth();
+// Registrierung
+registerBtn.addEventListener("click", async () => {
+  const { error } = await client.auth.signUp({
+    email: email.value,
+    password: password.value,
+  });
+
+  if (error) {
+    alert("Registrierung fehlgeschlagen: " + error.message);
+  } else {
+    alert("Registrierung erfolgreich! Du kannst dich jetzt einloggen.");
+  }
 });
 
 // Logout
 logoutBtn.addEventListener("click", async () => {
-  await supabase.auth.signOut();
+  await client.auth.signOut();
   location.reload();
 });
 
 // Profil speichern
 saveBtn.addEventListener("click", async () => {
-  const user = (await supabase.auth.getUser()).data.user;
+  const user = (await client.auth.getUser()).data.user;
   if (!user) return;
 
-  const { error } = await supabase.from("profiles").upsert({
+  const { error } = await client.from("profiles").upsert({
     id: user.id,
     name: nameInput.value,
     age: parseInt(ageInput.value),
@@ -72,10 +80,10 @@ saveBtn.addEventListener("click", async () => {
   }
 });
 
-// Talente suchen
+// Suche nach Skills
 searchBtn.addEventListener("click", async () => {
   const searchTerm = searchInput.value.toLowerCase();
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("profiles")
     .select("*")
     .contains("skills", [searchTerm]);
@@ -102,9 +110,9 @@ searchBtn.addEventListener("click", async () => {
   });
 });
 
-// Auth prüfen
+// Auth-Status prüfen
 async function checkAuth() {
-  const { data } = await supabase.auth.getSession();
+  const { data } = await client.auth.getSession();
   const user = data.session?.user;
 
   if (user) {
