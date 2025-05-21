@@ -1,122 +1,49 @@
-/* Allgemein */
 body {
-  font-family: 'Segoe UI', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  background: #f0f4f8;
+  padding: 1em;
+  background: #f9f9f9;
   color: #333;
 }
 
-/* Header */
 header {
-  background: #1d4ed8;
-  color: white;
-  padding: 1em 2em;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 1em;
 }
 
-header img {
-  height: 40px;
+.logo {
+  width: 50px;
 }
 
-h1 {
-  margin: 0;
-}
-
-/* Hauptbereich */
 main {
-  max-width: 700px;
-  margin: 2em auto;
-  padding: 2em;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  max-width: 600px;
+  margin: auto;
 }
 
-/* Abschnitte */
 section {
-  margin-bottom: 2em;
+  margin-top: 2em;
+  padding: 1em;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-h2 {
-  color: #1d4ed8;
-  margin-bottom: 1em;
-  text-align: center;
-}
-
-/* Eingabefelder */
-input {
-  width: 100%;
-  padding: 0.75em;
+input, button {
+  display: block;
   margin: 0.5em 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1em;
-  box-sizing: border-box;
+  padding: 0.5em;
+  width: 100%;
 }
 
-/* Buttons */
 button {
-  padding: 0.75em 1.5em;
-  margin-top: 1em;
-  background: #1d4ed8;
+  background: #0070f3;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 1em;
-  transition: background 0.2s ease;
 }
 
-button:hover {
-  background: #1e40af;
-}
-
-/* Button-Gruppe bei Auth */
-.button-group {
-  display: flex;
-  justify-content: center;
-  gap: 1em;
-}
-
-/* Auth-Box */
-#auth-section {
-  background: #f9fafb;
-  padding: 2em;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  max-width: 400px;
-  margin: 2em auto;
-  text-align: center;
-}
-
-/* Ergebnisliste */
-#results {
-  margin-top: 1em;
-}
-
-/* Profilkarten */
-.profile-card {
-  background: #f9fafb;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1em;
-  margin-bottom: 1em;
-  display: flex;
-  gap: 1em;
-  align-items: center;
-}
-
-.profile-card img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* Hilfsklasse */
 .hidden {
   display: none;
 }
