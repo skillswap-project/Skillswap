@@ -1,54 +1,121 @@
+/* Allgemein */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f1f5f9;
+  margin: 0;
+  padding: 0;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
 }
 
 .container {
-  background: white;
+  background-color: #ffffff;
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
   text-align: center;
-  width: 300px;
 }
 
-.logo {
-  width: 100px;
+h1 {
+  color: #0f172a;
+  font-size: 1.8rem;
   margin-bottom: 1rem;
 }
 
-.auth input {
-  width: 100%;
-  padding: 0.5rem;
-  margin: 0.5rem 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+h2 {
+  font-size: 1.2rem;
+  color: #334155;
+  margin-bottom: 1rem;
 }
 
-.buttons button {
-  padding: 0.5rem 1rem;
-  margin: 0.5rem;
+/* Formularelemente */
+input, textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+textarea {
+  min-height: 80px;
+}
+
+/* Buttons */
+.buttons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: white;
 }
 
 #loginBtn {
-  background-color: #4caf50;
-  color: white;
+  background-color: #10b981; /* grün */
 }
 
 #signupBtn {
-  background-color: #2196f3;
-  color: white;
+  background-color: #3b82f6; /* blau */
 }
 
-#message {
+#saveProfile {
+  background-color: #6366f1; /* indigo */
+}
+
+#logoutBtn {
+  background-color: #ef4444; /* rot */
+}
+
+#gotoSearch, #backToProfile {
+  background-color: #f59e0b; /* orange */
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+/* Nachrichten */
+#message, #profileMsg {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: #dc2626;
+}
+
+/* Suchergebnisse */
+#results {
   margin-top: 1rem;
-  color: red;
+  text-align: left;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#results div {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+#results div:last-child {
+  border-bottom: none;
+}
+
+#results strong {
+  color: #0f172a;
 }
