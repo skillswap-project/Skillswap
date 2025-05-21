@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2/dist/supabase.min.js"></script>
 </head>
 <body>
   <header>
@@ -17,15 +14,15 @@
   </header>
 
   <main>
-    <!-- Auth Section -->
+    <!-- Login / Registrierung -->
     <section id="auth-section">
       <h2>Login oder Registrieren</h2>
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Passwort">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Passwort" required>
       <button id="login-btn">Login / Registrieren</button>
     </section>
 
-    <!-- Profil Section -->
+    <!-- Profil bearbeiten -->
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
       <input id="name" placeholder="Name">
@@ -36,7 +33,7 @@
       <button id="save-profile-btn">Profil speichern</button>
     </section>
 
-    <!-- Suche Section -->
+    <!-- Suche -->
     <section id="search-section" class="hidden">
       <h2>Suche nach Talenten</h2>
       <input id="search-skill" placeholder="z.B. Mathe">
@@ -45,6 +42,10 @@
     </section>
   </main>
 
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2/dist/supabase.min.js"></script>
+  
+  <!-- Dein Script -->
   <script src="script.js"></script>
 </body>
 </html>
