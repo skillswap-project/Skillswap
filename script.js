@@ -1,7 +1,7 @@
 // Supabase initialisieren – ersetze durch deine echten Keys!
 const supabase = window.supabase.createClient(
-  'https://jdabagmcyxjjrknqrgkh.supabase.co',     // z. B. https://abcd1234.supabase.co
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'                            // z. B. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  'https://hmqzpwvofjvrlvkjwvgf.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtcXpwd3ZvZmp2cmx2a2p3dmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMjQ5MzksImV4cCI6MjA2MjgwMDkzOX0.RxhzSRQ4MC_McVrBvS2o2WyPyFegidWwnN5N6m8qXF8'
 );
 
 // Registrierung
@@ -31,7 +31,6 @@ async function signIn() {
     alert("Erfolgreich eingeloggt!");
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
-    document.getElementById('search-section').classList.remove('hidden');
     loadProfile();
   }
 }
@@ -62,10 +61,11 @@ async function saveProfile() {
     alert("Fehler beim Speichern: " + error.message);
   } else {
     alert("Profil gespeichert!");
+    previewAvatar();
   }
 }
 
-// Profil beim Login laden (optional)
+// Profil laden beim Login
 async function loadProfile() {
   const { data: sessionData } = await supabase.auth.getUser();
   const user = sessionData.user;
@@ -82,6 +82,19 @@ async function loadProfile() {
     document.getElementById('location').value = data.location || '';
     document.getElementById('talents').value = data.talents?.join(', ') || '';
     document.getElementById('avatar_url').value = data.avatar_url || '';
+    previewAvatar();
+  }
+}
+
+// Vorschau des Avatar-Bildes anzeigen
+function previewAvatar() {
+  const url = document.getElementById('avatar_url').value;
+  const img = document.getElementById('avatar-preview');
+  if (url) {
+    img.src = url;
+    img.classList.remove('hidden');
+  } else {
+    img.classList.add('hidden');
   }
 }
 
@@ -111,11 +124,24 @@ async function searchUsers() {
     const div = document.createElement('div');
     div.classList.add('result-card');
     div.innerHTML = `
-      <img src="${user.avatar_url}" alt="Avatar" width="50">
+      <img src="${user.avatar_url}" alt="Avatar" width="60" style="border-radius: 50%">
       <strong>${user.name}</strong> (${user.age}), ${user.location}<br>
-      <em>Talente:</em> ${user.talents.join(', ')}
-      <hr>
+      <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
     `;
     resultsDiv.appendChild(div);
   });
+}
+
+// Ansicht zwischen Profil und Suche umschalten
+function toggleSearch() {
+  const profile = document.getElementById('profile-section');
+  const search = document.getElementById('search-section');
+
+  if (search.classList.contains('hidden')) {
+    profile.classList.add('hidden');
+    search.classList.remove('hidden');
+  } else {
+    search.classList.add('hidden');
+    profile.classList.remove('hidden');
+  }
 }
