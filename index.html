@@ -5,35 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2/dist/supabase.min.js"></script>
 </head>
 <body>
   <header>
     <img src="logo.png" alt="SkillSwap Logo" />
     <h1>SkillSwap</h1>
-    <button id="logout-btn">Logout</button>
+    <button id="logout-btn" class="hidden">Logout</button>
   </header>
 
   <main>
+    <!-- Auth Section -->
     <section id="auth-section">
-      <h2>Login / Registrierung</h2>
+      <h2>Login oder Registrieren</h2>
       <input type="email" id="email" placeholder="Email">
       <input type="password" id="password" placeholder="Passwort">
       <button id="login-btn">Login / Registrieren</button>
     </section>
 
+    <!-- Profil Section -->
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
       <input id="name" placeholder="Name">
       <input id="age" type="number" placeholder="Alter">
       <input id="location" placeholder="Ort">
       <input id="skills" placeholder="Talente (z.B. Mathe, Klavier)">
-      <input id="avatar_url" placeholder="Bild-URL">
+      <input id="avatar_url" placeholder="Bild-URL (optional)">
       <button id="save-profile-btn">Profil speichern</button>
     </section>
 
+    <!-- Suche Section -->
     <section id="search-section" class="hidden">
       <h2>Suche nach Talenten</h2>
-      <input id="search-skill" placeholder="Suchbegriff z.B. Mathe">
+      <input id="search-skill" placeholder="z.B. Mathe">
       <button id="search-btn">Suchen</button>
       <div id="results"></div>
     </section>
