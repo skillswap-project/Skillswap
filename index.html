@@ -4,47 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SkillSwap</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <header>
+    <img src="logo.png" alt="SkillSwap Logo" />
     <h1>SkillSwap</h1>
+    <button id="logout-btn">Logout</button>
+  </header>
 
-    <!-- LOGIN -->
-    <div id="authView">
-      <h2>Anmelden / Registrieren</h2>
-      <input type="email" id="email" placeholder="E-Mail" />
-      <input type="password" id="password" placeholder="Passwort" />
-      <div class="buttons">
-        <button id="loginBtn">Login</button>
-        <button id="signupBtn">Registrieren</button>
-      </div>
-      <div id="message"></div>
-    </div>
+  <main>
+    <section id="auth-section">
+      <h2>Login / Registrierung</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Passwort">
+      <button id="login-btn">Login / Registrieren</button>
+    </section>
 
-    <!-- PROFIL -->
-    <div id="profileView" style="display:none;">
+    <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
-      <textarea id="info" placeholder="Kurze Info über dich..."></textarea>
-      <input type="text" id="talents" placeholder="Talente (z. B. Mathe, Klavier, Latein)" />
-      <div class="buttons">
-        <button id="saveProfile">Speichern</button>
-        <button id="logoutBtn">Logout</button>
-        <button id="gotoSearch">Zur Suche</button>
-      </div>
-      <div id="profileMsg"></div>
-    </div>
+      <input id="name" placeholder="Name">
+      <input id="age" type="number" placeholder="Alter">
+      <input id="location" placeholder="Ort">
+      <input id="skills" placeholder="Talente (z.B. Mathe, Klavier)">
+      <input id="avatar_url" placeholder="Bild-URL">
+      <button id="save-profile-btn">Profil speichern</button>
+    </section>
 
-    <!-- SUCHE -->
-    <div id="searchView" style="display:none;">
+    <section id="search-section" class="hidden">
       <h2>Suche nach Talenten</h2>
-      <input type="text" id="searchInput" placeholder="Talent (z. B. Mathe)" />
-      <button id="searchBtn">Suchen</button>
+      <input id="search-skill" placeholder="Suchbegriff z.B. Mathe">
+      <button id="search-btn">Suchen</button>
       <div id="results"></div>
-      <button id="backToProfile">Zurück zum Profil</button>
-    </div>
-  </div>
+    </section>
+  </main>
 
-  <script type="module" src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
