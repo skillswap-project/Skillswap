@@ -1,4 +1,3 @@
-// Supabase initialisieren – ersetze durch deine echten Keys!
 const supabase = window.supabase.createClient(
   'https://jdabagmcyxjjrknqrgkh.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
@@ -8,34 +7,28 @@ const supabase = window.supabase.createClient(
 async function signUp() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-
   const { error } = await supabase.auth.signUp({ email, password });
-
-  if (error) {
-    alert("Fehler bei der Registrierung: " + error.message);
-  } else {
-    alert("Registrierung erfolgreich! Bestätige deine E-Mail.");
-  }
+  if (error) alert("Fehler bei der Registrierung: " + error.message);
+  else alert("Registrierung erfolgreich! Bestätige deine E-Mail.");
 }
 
 // Anmeldung
 async function signIn() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    alert("Login fehlgeschlagen: " + error.message);
-  } else {
+  if (error) alert("Login fehlgeschlagen: " + error.message);
+  else {
     alert("Erfolgreich eingeloggt!");
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
+    loadTalentChips();
     loadProfile();
   }
 }
 
-// Profil speichern / aktualisieren
+// Profil speichern
 async function saveProfile() {
   const { data: sessionData } = await supabase.auth.getUser();
   const user = sessionData.user;
@@ -43,9 +36,7 @@ async function saveProfile() {
   const name = document.getElementById('name').value;
   const age = parseInt(document.getElementById('age').value);
   const location = document.getElementById('location').value;
-  const talents = document.getElementById('talents').value
-    .split(',')
-    .map(t => t.trim().toLowerCase());
+  const talents = document.getElementById('talents').value.split(',').map(t => t.trim());
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabase.from('profiles').upsert({
@@ -57,36 +48,47 @@ async function saveProfile() {
     avatar_url
   });
 
-  if (error) {
-    alert("Fehler beim Speichern: " + error.message);
-  } else {
+  if (error) alert("Fehler beim Speichern: " + error.message);
+  else {
     alert("Profil gespeichert!");
     previewAvatar();
   }
 }
 
-// Profil laden beim Login
+// Profil laden
 async function loadProfile() {
   const { data: sessionData } = await supabase.auth.getUser();
   const user = sessionData.user;
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
   if (data) {
     document.getElementById('name').value = data.name || '';
     document.getElementById('age').value = data.age || '';
     document.getElementById('location').value = data.location || '';
-    document.getElementById('talents').value = data.talents?.join(', ') || '';
     document.getElementById('avatar_url').value = data.avatar_url || '';
     previewAvatar();
+
+    document.getElementById('talents').value = data.talents?.join(',') || '';
+    const existingChips = Array.from(document.querySelectorAll('#chip-container .chip'));
+    const talents = data.talents || [];
+
+    talents.forEach(talent => {
+      let chip = existingChips.find(c => c.textContent.toLowerCase() === talent);
+      if (!chip) {
+        chip = document.createElement('div');
+        chip.classList.add('chip');
+        chip.textContent = talent;
+        chip.onclick = () => toggleTalent(chip);
+        document.getElementById('chip-container').appendChild(chip);
+      }
+      chip.classList.add('active');
+    });
+
+    updateHiddenTalentField();
   }
 }
 
-// Vorschau des Avatar-Bildes anzeigen
+// Avatar-Vorschau
 function previewAvatar() {
   const url = document.getElementById('avatar_url').value;
   const img = document.getElementById('avatar-preview');
@@ -98,25 +100,15 @@ function previewAvatar() {
   }
 }
 
-// Suche nach Talenten
+// Talente suchen
 async function searchUsers() {
   const term = document.getElementById('search-term').value.toLowerCase().trim();
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .contains('talents', [term]);
-
+  const { data, error } = await supabase.from('profiles').select('*').contains('talents', [term]);
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
 
-  if (error) {
-    resultsDiv.innerText = "Fehler bei der Suche.";
-    return;
-  }
-
-  if (!data.length) {
-    resultsDiv.innerText = "Keine Treffer.";
+  if (error || !data.length) {
+    resultsDiv.innerText = error ? "Fehler bei der Suche." : "Keine Treffer.";
     return;
   }
 
@@ -132,16 +124,88 @@ async function searchUsers() {
   });
 }
 
-// Ansicht zwischen Profil und Suche umschalten
+// Ansicht umschalten
 function toggleSearch() {
-  const profile = document.getElementById('profile-section');
-  const search = document.getElementById('search-section');
+  document.getElementById('profile-section').classList.toggle('hidden');
+  document.getElementById('search-section').classList.toggle('hidden');
+}
 
-  if (search.classList.contains('hidden')) {
-    profile.classList.add('hidden');
-    search.classList.remove('hidden');
-  } else {
-    search.classList.add('hidden');
-    profile.classList.remove('hidden');
+// Chips aktivieren/deaktivieren
+function toggleTalent(element) {
+  element.classList.toggle('active');
+  updateHiddenTalentField();
+}
+
+// Chips-Feld aktualisieren
+function updateHiddenTalentField() {
+  const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
+  document.getElementById('talents').value = activeChips.join(',');
+}
+
+// Neues Talent hinzufügen
+async function checkNewTalent(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    const input = document.getElementById('new-talent');
+    const talent = input.value.trim().toLowerCase();
+    input.value = '';
+    if (!talent) return;
+
+    const existing = Array.from(document.querySelectorAll('#chip-container .chip'))
+      .map(chip => chip.textContent.toLowerCase());
+
+    if (existing.includes(talent)) return;
+
+    const newChip = document.createElement('div');
+    newChip.classList.add('chip', 'active');
+    newChip.textContent = talent;
+    newChip.onclick = () => toggleTalent(newChip);
+    document.getElementById('chip-container').appendChild(newChip);
+
+    await supabase.from('talent_tags').insert({ name: talent }).catch(() => {});
+    updateHiddenTalentField();
   }
+}
+
+// Avatar-Datei hochladen
+async function uploadAvatar() {
+  const fileInput = document.getElementById('avatar_file');
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const { data: session } = await supabase.auth.getUser();
+  const userId = session.user.id;
+  const filePath = `${userId}/${file.name}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    alert("Fehler beim Hochladen des Bildes: " + uploadError.message);
+    return;
+  }
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+  const url = data.publicUrl;
+
+  document.getElementById('avatar_url').value = url;
+  previewAvatar();
+}
+
+// Alle Talent-Chips aus DB laden
+async function loadTalentChips() {
+  const { data, error } = await supabase.from('talent_tags').select('*').order('name');
+  const chipContainer = document.getElementById('chip-container');
+  chipContainer.innerHTML = '';
+
+  if (error) return;
+
+  data.forEach(t => {
+    const chip = document.createElement('div');
+    chip.classList.add('chip');
+    chip.textContent = t.name;
+    chip.onclick = () => toggleTalent(chip);
+    chipContainer.appendChild(chip);
+  });
 }
