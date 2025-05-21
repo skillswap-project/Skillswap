@@ -2,29 +2,49 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkillSwap Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" alt="Logo" class="logo" />
-    
-    <div class="auth">
+    <h1>SkillSwap</h1>
+
+    <!-- LOGIN -->
+    <div id="authView">
       <h2>Anmelden / Registrieren</h2>
       <input type="email" id="email" placeholder="E-Mail" />
       <input type="password" id="password" placeholder="Passwort" />
-      
       <div class="buttons">
         <button id="loginBtn">Login</button>
         <button id="signupBtn">Registrieren</button>
       </div>
-      
       <div id="message"></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div id="profileView" style="display:none;">
+      <h2>Dein Profil</h2>
+      <textarea id="info" placeholder="Kurze Info über dich..."></textarea>
+      <input type="text" id="talents" placeholder="Talente (z. B. Mathe, Klavier, Latein)" />
+      <div class="buttons">
+        <button id="saveProfile">Speichern</button>
+        <button id="logoutBtn">Logout</button>
+        <button id="gotoSearch">Zur Suche</button>
+      </div>
+      <div id="profileMsg"></div>
+    </div>
+
+    <!-- SUCHE -->
+    <div id="searchView" style="display:none;">
+      <h2>Suche nach Talenten</h2>
+      <input type="text" id="searchInput" placeholder="Talent (z. B. Mathe)" />
+      <button id="searchBtn">Suchen</button>
+      <div id="results"></div>
+      <button id="backToProfile">Zurück zum Profil</button>
     </div>
   </div>
 
-  <!-- WICHTIG: Script mit type="module" -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
