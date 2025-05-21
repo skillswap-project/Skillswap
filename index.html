@@ -12,6 +12,7 @@
   </header>
 
   <main>
+    <!-- LOGIN -->
     <section id="auth-section">
       <h2>Anmelden / Registrieren</h2>
       <input type="email" id="email" placeholder="Email">
@@ -20,6 +21,7 @@
       <button onclick="signIn()">Anmelden</button>
     </section>
 
+    <!-- PROFIL -->
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
       <img id="avatar-preview" class="avatar-preview hidden" />
@@ -29,7 +31,16 @@
       <input type="text" id="talents" placeholder="Talente (z.B. Mathe, Klavier)">
       <input type="text" id="avatar_url" placeholder="Avatar-URL" oninput="previewAvatar()">
       <button onclick="saveProfile()">Profil speichern</button>
-      <a href="search.html"><button>Talente suchen</button></a>
+      <button onclick="toggleSearch()">Talente suchen</button>
+    </section>
+
+    <!-- SUCHE -->
+    <section id="search-section" class="hidden">
+      <h2>Talente finden</h2>
+      <input type="text" id="search-term" placeholder="z.B. Mathe">
+      <button onclick="searchUsers()">Suchen</button>
+      <div id="results"></div>
+      <button onclick="toggleSearch()">Zurück zum Profil</button>
     </section>
   </main>
 
