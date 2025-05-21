@@ -1,52 +1,44 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <img src="logo.png" alt="SkillSwap Logo" />
+    <img src="logo.png" alt="SkillSwap Logo" class="logo">
     <h1>SkillSwap</h1>
-    <button id="logout-btn" class="hidden">Logout</button>
   </header>
 
   <main>
-    <!-- Auth -->
     <section id="auth-section">
-      <h2>Willkommen bei SkillSwap</h2>
-      <p>Bitte logge dich ein oder registriere dich:</p>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="password" id="password" placeholder="Passwort" required>
-      <div class="button-group">
-        <button id="login-btn">Login</button>
-        <button id="register-btn">Registrieren</button>
-      </div>
+      <h2>Anmelden / Registrieren</h2>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Passwort">
+      <button onclick="signUp()">Registrieren</button>
+      <button onclick="signIn()">Anmelden</button>
     </section>
 
-    <!-- Profil -->
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
-      <input id="name" placeholder="Name">
-      <input id="age" type="number" placeholder="Alter">
-      <input id="location" placeholder="Ort">
-      <input id="skills" placeholder="Talente (z.B. Mathe, Klavier)">
-      <input id="avatar_url" placeholder="Bild-URL (optional)">
-      <button id="save-profile-btn">Profil speichern</button>
+      <input type="text" id="name" placeholder="Name">
+      <input type="number" id="age" placeholder="Alter">
+      <input type="text" id="location" placeholder="Ort">
+      <input type="text" id="talents" placeholder="Talente (z.B. Mathe, Klavier)">
+      <input type="text" id="avatar_url" placeholder="Avatar-URL">
+      <button onclick="saveProfile()">Profil speichern</button>
     </section>
 
-    <!-- Suche -->
     <section id="search-section" class="hidden">
-      <h2>Suche nach Talenten</h2>
-      <input id="search-skill" placeholder="z.B. Mathe">
-      <button id="search-btn">Suchen</button>
+      <h2>Talente suchen</h2>
+      <input type="text" id="search-term" placeholder="z.B. Mathe">
+      <button onclick="searchUsers()">Suchen</button>
       <div id="results"></div>
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.43.2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="script.js"></script>
 </body>
 </html>
