@@ -22,23 +22,18 @@
 
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
+      <img id="avatar-preview" class="avatar-preview hidden" />
       <input type="text" id="name" placeholder="Name">
       <input type="number" id="age" placeholder="Alter">
       <input type="text" id="location" placeholder="Ort">
       <input type="text" id="talents" placeholder="Talente (z.B. Mathe, Klavier)">
-      <input type="text" id="avatar_url" placeholder="Avatar-URL">
+      <input type="text" id="avatar_url" placeholder="Avatar-URL" oninput="previewAvatar()">
       <button onclick="saveProfile()">Profil speichern</button>
-    </section>
-
-    <section id="search-section" class="hidden">
-      <h2>Talente suchen</h2>
-      <input type="text" id="search-term" placeholder="z.B. Mathe">
-      <button onclick="searchUsers()">Suchen</button>
-      <div id="results"></div>
+      <a href="search.html"><button>Talente suchen</button></a>
     </section>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>
