@@ -130,19 +130,19 @@ function toggleSearch() {
   document.getElementById('search-section').classList.toggle('hidden');
 }
 
-// Chips aktivieren/deaktivieren
+// Chip aktivieren/deaktivieren
 function toggleTalent(element) {
   element.classList.toggle('active');
   updateHiddenTalentField();
 }
 
-// Chips-Feld aktualisieren
+// Alle aktiven Chips → verstecktes Feld aktualisieren
 function updateHiddenTalentField() {
   const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Neues Talent hinzufügen
+// Neues Talent-Chip per Eingabe hinzufügen
 async function checkNewTalent(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -162,12 +162,17 @@ async function checkNewTalent(event) {
     newChip.onclick = () => toggleTalent(newChip);
     document.getElementById('chip-container').appendChild(newChip);
 
-    await supabase.from('talent_tags').insert({ name: talent }).catch(() => {});
+    try {
+      await supabase.from('talent_tags').insert({ name: talent });
+    } catch (e) {
+      // z. B. duplicate key – ignorieren
+    }
+
     updateHiddenTalentField();
   }
 }
 
-// Avatar-Datei hochladen
+// Avatar-Datei hochladen → Supabase Storage
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
   const file = fileInput.files[0];
@@ -193,7 +198,7 @@ async function uploadAvatar() {
   previewAvatar();
 }
 
-// Alle Talent-Chips aus DB laden
+// Talente aus der DB laden und als Chips anzeigen
 async function loadTalentChips() {
   const { data, error } = await supabase.from('talent_tags').select('*').order('name');
   const chipContainer = document.getElementById('chip-container');
