@@ -24,12 +24,27 @@
     <!-- PROFIL -->
     <section id="profile-section" class="hidden">
       <h2>Dein Profil</h2>
+
+      <!-- Avatar-Vorschau -->
       <img id="avatar-preview" class="avatar-preview hidden" />
+
+      <!-- Avatar-Upload -->
+      <input type="file" id="avatar_file" accept="image/*" onchange="uploadAvatar()" />
+      <input type="hidden" id="avatar_url" />
+
+      <!-- Persönliche Angaben -->
       <input type="text" id="name" placeholder="Name">
       <input type="number" id="age" placeholder="Alter">
       <input type="text" id="location" placeholder="Ort">
-      <input type="text" id="talents" placeholder="Talente (z.B. Mathe, Klavier)">
-      <input type="text" id="avatar_url" placeholder="Avatar-URL" oninput="previewAvatar()">
+
+      <!-- Talente-Auswahl -->
+      <div id="talent-options">
+        <p>Wähle deine Talente oder füge neue hinzu:</p>
+        <div id="chip-container"></div>
+        <input type="text" id="new-talent" placeholder="Neues Talent eingeben" onkeydown="checkNewTalent(event)">
+      </div>
+      <input type="hidden" id="talents" />
+
       <button onclick="saveProfile()">Profil speichern</button>
       <button onclick="toggleSearch()">Talente suchen</button>
     </section>
@@ -44,6 +59,7 @@
     </section>
   </main>
 
+  <!-- Supabase & JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
