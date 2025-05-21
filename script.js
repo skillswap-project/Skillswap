@@ -1,122 +1,95 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
 // Supabase-Konfiguration
 const supabaseUrl = 'https://hmqzpwvofjvrlvkjwvgf.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtcXpwd3ZvZmp2cmx2a2p3dmdmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMjQ5MzksImV4cCI6MjA2MjgwMDkzOX0.RxhzSRQ4MC_McVrBvS2o2WyPyFegidWwnN5N6m8qXF8' 
-const supabase = createClient(supabaseUrl, supabaseKey)
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Elemente
-const authView = document.getElementById('authView')
-const profileView = document.getElementById('profileView')
-const searchView = document.getElementById('searchView')
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const authSection = document.getElementById("auth-section");
+const profileSection = document.getElementById("profile-section");
+const searchSection = document.getElementById("search-section");
 
-const emailInput = document.getElementById('email')
-const passwordInput = document.getElementById('password')
-const loginBtn = document.getElementById('loginBtn')
-const signupBtn = document.getElementById('signupBtn')
-const message = document.getElementById('message')
+const nameInput = document.getElementById("name");
+const ageInput = document.getElementById("age");
+const locationInput = document.getElementById("location");
+const skillsInput = document.getElementById("skills");
+const avatarInput = document.getElementById("avatar_url");
+const saveProfileBtn = document.getElementById("save-profile-btn");
 
-const infoInput = document.getElementById('info')
-const talentsInput = document.getElementById('talents')
-const saveProfile = document.getElementById('saveProfile')
-const profileMsg = document.getElementById('profileMsg')
-const logoutBtn = document.getElementById('logoutBtn')
-const gotoSearch = document.getElementById('gotoSearch')
+const searchInput = document.getElementById("search-skill");
+const searchBtn = document.getElementById("search-btn");
+const resultsDiv = document.getElementById("results");
 
-const searchInput = document.getElementById('searchInput')
-const searchBtn = document.getElementById('searchBtn')
-const results = document.getElementById('results')
-const backToProfile = document.getElementById('backToProfile')
-
-// Auth-Handling
-loginBtn.onclick = async () => {
-  const { error } = await supabase.auth.signInWithPassword({
+loginBtn.addEventListener("click", async () => {
+  const { user, error } = await supabase.auth.signInWithPassword({
     email: emailInput.value,
-    password: passwordInput.value,
-  })
-  if (error) message.textContent = '❌ ' + error.message
-  else await loadProfile()
-}
+    password: passwordInput.value
+  });
 
-signupBtn.onclick = async () => {
-  const { error } = await supabase.auth.signUp({
-    email: emailInput.value,
-    password: passwordInput.value,
-  })
-  if (error) message.textContent = '❌ ' + error.message
-  else message.textContent = '✅ Bitte E-Mail bestätigen.'
-}
+  if (!user && error?.message.includes("Invalid login")) {
+    await supabase.auth.signUp({
+      email: emailInput.value,
+      password: passwordInput.value
+    });
+  }
 
-// Profil speichern
-saveProfile.onclick = async () => {
-  const user = await supabase.auth.getUser()
-  const user_id = user.data.user.id
-  const info = infoInput.value.trim()
-  const talents = talentsInput.value.split(',').map(t => t.trim()).filter(t => t)
+  checkAuth();
+});
 
-  const { error } = await supabase.from('profiles').upsert({
-    user_id,
-    info,
-    talents,
-  })
+logoutBtn.addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  location.reload();
+});
 
-  profileMsg.textContent = error ? '❌ Fehler beim Speichern' : '✅ Profil gespeichert'
-}
+saveProfileBtn.addEventListener("click", async () => {
+  const user = (await supabase.auth.getUser()).data.user;
+  if (!user) return;
 
-// Logout
-logoutBtn.onclick = async () => {
-  await supabase.auth.signOut()
-  showView('auth')
-}
+  const { data, error } = await supabase.from("profiles").upsert({
+    id: user.id,
+    name: nameInput.value,
+    age: parseInt(ageInput.value),
+    location: locationInput.value,
+    skills: skillsInput.value.split(",").map(s => s.trim()),
+    avatar_url: avatarInput.value
+  });
 
-// Navigation
-gotoSearch.onclick = () => showView('search')
-backToProfile.onclick = () => showView('profile')
+  alert("Profil gespeichert!");
+});
 
-// Suche
-searchBtn.onclick = async () => {
-  const term = searchInput.value.trim()
-  results.innerHTML = '⏳ Suche...'
+searchBtn.addEventListener("click", async () => {
+  const search = searchInput.value.toLowerCase();
 
   const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .contains('talents', [term])
+    .from("profiles")
+    .select("*")
+    .contains("skills", [search]);
 
-  if (error) {
-    results.textContent = '❌ Fehler bei der Suche.'
-  } else if (data.length === 0) {
-    results.textContent = '❌ Keine passenden Profile gefunden.'
-  } else {
-    results.innerHTML = data.map(p =>
-      `<div><strong>Info:</strong> ${p.info}<br/><strong>Talente:</strong> ${p.talents.join(', ')}</div><hr/>`
-    ).join('')
+  resultsDiv.innerHTML = "";
+  data.forEach(profile => {
+    const card = document.createElement("div");
+    card.className = "profile-card";
+    card.innerHTML = `
+      <img src="${profile.avatar_url}" alt="Avatar" style="width:100px;height:100px;">
+      <h3>${profile.name}</h3>
+      <p>Alter: ${profile.age}</p>
+      <p>Ort: ${profile.location}</p>
+      <p>Talente: ${profile.skills.join(", ")}</p>
+    `;
+    resultsDiv.appendChild(card);
+  });
+});
+
+async function checkAuth() {
+  const { data } = await supabase.auth.getSession();
+  const user = data.session?.user;
+  if (user) {
+    authSection.classList.add("hidden");
+    profileSection.classList.remove("hidden");
+    searchSection.classList.remove("hidden");
   }
 }
 
-// Ansicht wechseln
-function showView(view) {
-  authView.style.display = view === 'auth' ? 'block' : 'none'
-  profileView.style.display = view === 'profile' ? 'block' : 'none'
-  searchView.style.display = view === 'search' ? 'block' : 'none'
-}
-
-// Automatisch einloggen, wenn Session existiert
-window.onload = async () => {
-  const session = await supabase.auth.getSession()
-  if (session.data.session) loadProfile()
-}
-
-async function loadProfile() {
-  showView('profile')
-  const user = await supabase.auth.getUser()
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.data.user.id)
-    .single()
-  if (data) {
-    infoInput.value = data.info
-    talentsInput.value = data.talents.join(', ')
-  }
-}
+checkAuth();
