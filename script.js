@@ -30,6 +30,8 @@ async function signIn() {
 
 // Profil speichern
 async function saveProfile() {
+  updateHiddenTalentField(); // sicherstellen, dass Chips synchron sind
+
   const { data: sessionData } = await supabase.auth.getUser();
   const user = sessionData.user;
 
@@ -52,10 +54,7 @@ async function saveProfile() {
   });
 
   if (error) alert("Fehler beim Speichern: " + error.message);
-  else {
-    alert("Profil gespeichert!");
-    previewAvatar();
-  }
+  else alert("Profil gespeichert!");
 }
 
 // Profil laden
@@ -71,23 +70,18 @@ async function loadProfile() {
     document.getElementById('avatar_url').value = data.avatar_url || '';
     previewAvatar();
 
-    document.getElementById('talents').value = data.talents?.join(',') || '';
-    const existingChips = Array.from(document.querySelectorAll('#chip-container .chip'));
+    const chips = document.querySelectorAll('#chip-container .chip');
     const talents = data.talents || [];
+    document.getElementById('talents').value = talents.join(',');
 
-    talents.forEach(talent => {
-      let chip = existingChips.find(c => c.textContent.toLowerCase() === talent);
-      if (!chip) {
-        chip = document.createElement('div');
-        chip.classList.add('chip');
-        chip.textContent = talent;
-        chip.onclick = () => toggleTalent(chip);
-        document.getElementById('chip-container').appendChild(chip);
+    chips.forEach(chip => {
+      const chipText = chip.textContent.toLowerCase();
+      if (talents.includes(chipText)) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
       }
-      chip.classList.add('active');
     });
-
-    updateHiddenTalentField();
   }
 }
 
@@ -103,7 +97,7 @@ function previewAvatar() {
   }
 }
 
-// Benutzer mit passenden Talenten finden (mehrfach-Suche möglich)
+// Talente suchen
 async function searchUsers() {
   const terms = document.getElementById('search-term').value
     .toLowerCase()
@@ -136,25 +130,26 @@ async function searchUsers() {
   });
 }
 
-// Ansicht wechseln zwischen Profil und Suche
+// Ansicht umschalten
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
 }
 
-// Chips aktivieren/deaktivieren
+// Chip aktivieren/deaktivieren
 function toggleTalent(element) {
   element.classList.toggle('active');
   updateHiddenTalentField();
 }
 
-// Verstecktes Feld mit aktiven Talenten aktualisieren
+// Talente-Feld aus aktiven Chips aktualisieren
 function updateHiddenTalentField() {
-  const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
+  const activeChips = Array.from(document.querySelectorAll('.chip.active'))
+    .map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Neues Talent als Chip & DB-Eintrag hinzufügen
+// Neues Talent hinzufügen
 async function checkNewTalent(event) {
   if (event.key === 'Enter') {
     event.preventDefault();
@@ -177,14 +172,14 @@ async function checkNewTalent(event) {
     try {
       await supabase.from('talent_tags').insert({ name: talent });
     } catch (e) {
-      // Fehler ignorieren (z. B. bereits vorhanden)
+      // ignorieren (z. B. Duplikat)
     }
 
     updateHiddenTalentField();
   }
 }
 
-// Avatar-Datei in Supabase Storage hochladen
+// Avatar-Datei hochladen
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
   const file = fileInput.files[0];
@@ -210,7 +205,7 @@ async function uploadAvatar() {
   previewAvatar();
 }
 
-// Alle Chips aus der talent_tags-Tabelle laden
+// Talente aus DB laden und anzeigen
 async function loadTalentChips() {
   const { data, error } = await supabase.from('talent_tags').select('*').order('name');
   const chipContainer = document.getElementById('chip-container');
@@ -225,4 +220,6 @@ async function loadTalentChips() {
     chip.onclick = () => toggleTalent(chip);
     chipContainer.appendChild(chip);
   });
+
+  updateHiddenTalentField(); // initial synchronisieren
 }
