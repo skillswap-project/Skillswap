@@ -48,6 +48,7 @@ async function saveProfile() {
   updateHiddenTalentField();
   const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
+
   const name = document.getElementById('name').value;
   const age = parseInt(document.getElementById('age').value);
   const location = document.getElementById('location').value;
@@ -58,7 +59,7 @@ async function saveProfile() {
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabaseClient.from('profiles').upsert({
-    id: user.id,
+    id: user.id, // ✅ sorgt dafür, dass jeder User genau ein eigenes Profil hat
     name,
     age,
     location,
@@ -70,15 +71,17 @@ async function saveProfile() {
   else alert("Profil gespeichert!");
 }
 
+
 // Profil laden
 async function loadProfile() {
   const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
+
   const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .maybeSingle();
+    .maybeSingle(); // ✅ kein 406-Fehler, wenn kein Datensatz
 
   if (data) {
     document.getElementById('name').value = data.name || '';
@@ -94,8 +97,17 @@ async function loadProfile() {
       const chipText = chip.textContent.toLowerCase();
       chip.classList.toggle('active', talents.includes(chipText));
     });
+  } else {
+    // Neues Profil – Felder leer lassen
+    document.getElementById('name').value = '';
+    document.getElementById('age').value = '';
+    document.getElementById('location').value = '';
+    document.getElementById('avatar_url').value = '';
+    previewAvatar();
+    document.getElementById('talents').value = '';
   }
 }
+
 
 // Avatar-Vorschau
 function previewAvatar() {
