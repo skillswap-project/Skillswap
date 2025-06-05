@@ -297,5 +297,20 @@ async function searchUsers() {
       <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
     `;
     resultsDiv.appendChild(div);
-  });
+  });async function signIn() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  console.log("Login mit:", email, password);
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert("Login fehlgeschlagen: " + error.message);
+    console.error("Supabase-Fehler:", error);
+  } else {
+    alert("Erfolgreich eingeloggt!");
+    console.log("Login-Daten:", data);
+    // hier deinen Code zum Wechseln der Ansicht usw.
+  }
+}
+
 }
