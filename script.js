@@ -230,10 +230,17 @@ async function signOut() {
     return;
   }
 
+  // Nutzer erfolgreich abgemeldet
   alert("Du wurdest abgemeldet.");
-  document.getElementById('auth-section').classList.remove('hidden');
-  document.getElementById('profile-section').classList.add('hidden');
-  document.getElementById('search-section').classList.add('hidden');
+
+  // Sichtbarkeit der Sektionen anpassen:
+  document.getElementById('auth-section').classList.remove('hidden');    // Anmeldebereich anzeigen
+  document.getElementById('profile-section').classList.add('hidden');    // Profilbereich ausblenden
+  document.getElementById('search-section').classList.add('hidden');     // Suchbereich ausblenden (falls offen)
+
+  // Logout-Button verstecken
+  document.getElementById('logout-button').style.display = 'none';
 }
+
 
 }
