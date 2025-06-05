@@ -1,8 +1,7 @@
 const { createClient } = supabase;
 const supabaseClient = createClient(
-'https://jdabagmcyxjjrknqrgkh.supabase.co',
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
-
+  'https://jdabagmcyxjjrknqrgkh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
 );
 
 // Registrierung
@@ -28,7 +27,6 @@ async function signIn() {
     document.getElementById('logout-button').style.display = 'block';
     loadTalentChips();
     loadProfile();
-    loadInbox(); // ← neu: Posteingang laden nach Login
   }
 }
 
@@ -43,7 +41,6 @@ async function signOut() {
   document.getElementById('auth-section').classList.remove('hidden');
   document.getElementById('profile-section').classList.add('hidden');
   document.getElementById('search-section').classList.add('hidden');
-  document.getElementById('inbox-section').classList.add('hidden');
   document.getElementById('logout-button').style.display = 'none';
 }
 // Profil speichern
@@ -62,7 +59,7 @@ async function saveProfile() {
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabaseClient.from('profiles').upsert({
-    id: user.id,
+    id: user.id, // ✅ sorgt dafür, dass jeder User genau ein eigenes Profil hat
     name,
     age,
     location,
@@ -74,6 +71,7 @@ async function saveProfile() {
   else alert("Profil gespeichert!");
 }
 
+
 // Profil laden
 async function loadProfile() {
   const { data: sessionData } = await supabaseClient.auth.getUser();
@@ -83,7 +81,7 @@ async function loadProfile() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .maybeSingle();
+    .maybeSingle(); // ✅ kein 406-Fehler, wenn kein Datensatz
 
   if (data) {
     document.getElementById('name').value = data.name || '';
@@ -100,6 +98,7 @@ async function loadProfile() {
       chip.classList.toggle('active', talents.includes(chipText));
     });
   } else {
+    // Neues Profil – Felder leer lassen
     document.getElementById('name').value = '';
     document.getElementById('age').value = '';
     document.getElementById('location').value = '';
@@ -108,6 +107,8 @@ async function loadProfile() {
     document.getElementById('talents').value = '';
   }
 }
+
+
 // Avatar-Vorschau
 function previewAvatar() {
   const url = document.getElementById('avatar_url').value;
@@ -119,7 +120,6 @@ function previewAvatar() {
     img.classList.add('hidden');
   }
 }
-
 // Avatar hochladen
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
@@ -176,8 +176,7 @@ async function checkNewTalent(event) {
     input.value = '';
     if (!talent) return;
 
-    const existing = Array.from(document.querySelectorAll('#chip-container .chip'))
-      .map(chip => chip.textContent.toLowerCase());
+    const existing = Array.from(document.querySelectorAll('#chip-container .chip')).map(chip => chip.textContent.toLowerCase());
     if (existing.includes(talent)) return;
 
     const newChip = document.createElement('div');
@@ -232,7 +231,7 @@ async function searchUsers() {
   });
 }
 
-// Nachricht senden & empfangen
+// Nachricht senden & Modal
 let selectedRecipientId = null;
 
 function openMessageModal(userId, userName) {
@@ -266,44 +265,6 @@ async function sendMessage() {
   }
 }
 
-// Posteingang
-async function loadInbox() {
-  const { data: sessionData } = await supabaseClient.auth.getUser();
-  const user = sessionData.user;
-
-  const { data, error } = await supabaseClient
-    .from('messages')
-    .select('*, sender:profiles!messages_sender_id_fkey(name)')
-    .eq('receiver_id', user.id)
-    .order('created_at', { ascending: false });
-
-  const inboxDiv = document.getElementById('inbox');
-  inboxDiv.innerHTML = '';
-
-  if (error) {
-    inboxDiv.innerText = "Fehler beim Laden der Nachrichten: " + error.message;
-    return;
-  }
-
-  if (!data.length) {
-    inboxDiv.innerText = "Keine Nachrichten.";
-    return;
-  }
-
-  data.forEach(msg => {
-    const msgDiv = document.createElement('div');
-    msgDiv.classList.add('message');
-    msgDiv.innerHTML = `
-      <strong>Von: ${msg.sender?.name || 'Unbekannt'}</strong><br>
-      <p>${msg.content}</p>
-      <small>${new Date(msg.created_at).toLocaleString()}</small>
-      <button onclick="openMessageModal('${msg.sender_id}', '${msg.sender?.name || 'Antwort'}')">Antworten</button>
-      <hr>
-    `;
-    inboxDiv.appendChild(msgDiv);
-  });
-}
-
 // UI-Helfer
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
@@ -316,12 +277,11 @@ function toggleTalent(element) {
 }
 
 function updateHiddenTalentField() {
-  const activeChips = Array.from(document.querySelectorAll('.chip.active'))
-    .map(c => c.textContent.toLowerCase());
+  const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Automatisch prüfen, ob User eingeloggt ist
+// Automatisch prüfen, ob bereits eingeloggt
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
@@ -330,7 +290,6 @@ window.addEventListener('load', async () => {
     document.getElementById('logout-button').style.display = 'block';
     loadTalentChips();
     loadProfile();
-    loadInbox();
   } else {
     document.getElementById('auth-section').classList.remove('hidden');
     document.getElementById('profile-section').classList.add('hidden');
@@ -338,7 +297,7 @@ window.addEventListener('load', async () => {
   }
 });
 
-// Globale Funktionen
+// Globale Verfügbarkeit im HTML
 window.signUp = signUp;
 window.signIn = signIn;
 window.signOut = signOut;
@@ -352,4 +311,3 @@ window.sendMessage = sendMessage;
 window.openMessageModal = openMessageModal;
 window.closeMessageModal = closeMessageModal;
 window.toggleSearch = toggleSearch;
-window.loadInbox = loadInbox;
