@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 const supabaseClient = createClient(
  'https://jdabagmcyxjjrknqrgkh.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
+ 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
 );
 
 // Registrierung
@@ -47,17 +47,12 @@ async function signOut() {
 // Profil speichern
 async function saveProfile() {
   updateHiddenTalentField();
-
   const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
-
   const name = document.getElementById('name').value;
   const age = parseInt(document.getElementById('age').value);
   const location = document.getElementById('location').value;
-  const talents = document.getElementById('talents').value
-    .split(',')
-    .map(t => t.trim().toLowerCase())
-    .filter(t => t.length > 0);
+  const talents = document.getElementById('talents').value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabaseClient.from('profiles').upsert({
@@ -77,22 +72,15 @@ async function saveProfile() {
 async function loadProfile() {
   const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
-  const { data, error } = await supabaseClient
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
+  const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
   if (data) {
     document.getElementById('name').value = data.name || '';
     document.getElementById('age').value = data.age || '';
     document.getElementById('location').value = data.location || '';
     document.getElementById('avatar_url').value = data.avatar_url || '';
     previewAvatar();
-
     const talents = data.talents || [];
     document.getElementById('talents').value = talents.join(',');
-
     const chips = document.querySelectorAll('#chip-container .chip');
     chips.forEach(chip => {
       const chipText = chip.textContent.toLowerCase();
@@ -118,15 +106,11 @@ async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
   const file = fileInput.files[0];
   if (!file) return;
-
   const { data: session } = await supabaseClient.auth.getUser();
   const userId = session.user.id;
   const filePath = `${userId}/${file.name}`;
 
-  const { error: uploadError } = await supabaseClient.storage
-    .from('avatars')
-    .upload(filePath, file, { upsert: true });
-
+  const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file, { upsert: true });
   if (uploadError) {
     alert("Fehler beim Hochladen des Bildes: " + uploadError.message);
     return;
@@ -134,20 +118,15 @@ async function uploadAvatar() {
 
   const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
   const url = data.publicUrl;
-
   document.getElementById('avatar_url').value = url;
   previewAvatar();
 }
 
 // Talente laden
 async function loadTalentChips() {
-  const { data, error } = await supabaseClient
-    .from('talent_tags')
-    .select('*')
-    .order('name');
+  const { data, error } = await supabaseClient.from('talent_tags').select('*').order('name');
   const chipContainer = document.getElementById('chip-container');
   chipContainer.innerHTML = '';
-
   if (error) return;
 
   data.forEach(t => {
@@ -170,8 +149,7 @@ async function checkNewTalent(event) {
     input.value = '';
     if (!talent) return;
 
-    const existing = Array.from(document.querySelectorAll('#chip-container .chip'))
-      .map(chip => chip.textContent.toLowerCase());
+    const existing = Array.from(document.querySelectorAll('#chip-container .chip')).map(chip => chip.textContent.toLowerCase());
     if (existing.includes(talent)) return;
 
     const newChip = document.createElement('div');
@@ -199,11 +177,7 @@ async function searchUsers() {
   const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
-    .or(`
-      name.ilike.%${term}%,
-      location.ilike.%${term}%,
-      talents.cs.{${term}}
-    `);
+    .or(`name.ilike.%${term}%,location.ilike.%${term}%,talents.cs.["${term}"]`);
 
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
@@ -230,26 +204,23 @@ async function searchUsers() {
   });
 }
 
-// Ansicht umschalten
+// UI-Handling
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
 }
 
-// Chip aktivieren/deaktivieren
 function toggleTalent(element) {
   element.classList.toggle('active');
   updateHiddenTalentField();
 }
 
-// Verstecktes Feld für Talente aktualisieren
 function updateHiddenTalentField() {
-  const activeChips = Array.from(document.querySelectorAll('.chip.active'))
-    .map(c => c.textContent.toLowerCase());
+  const activeChips = Array.from(document.querySelectorAll('.chip.active')).map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Beim Laden prüfen, ob Nutzer eingeloggt ist
+// On Load
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
@@ -265,7 +236,7 @@ window.addEventListener('load', async () => {
   }
 });
 
-// Globale Zuweisung für HTML onclick-Zugriffe
+// Für HTML-Zugriffe
 window.signIn = signIn;
 window.signUp = signUp;
 window.signOut = signOut;
