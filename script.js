@@ -1,6 +1,6 @@
-const supabase = supabase.createClient(
-
-  'https://jdabagmcyxjjrknqrgkh.supabase.co',
+const { createClient } = supabase;
+const supabaseClient = createClient(
+ 'https://jdabagmcyxjjrknqrgkh.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
 );
 
@@ -8,7 +8,7 @@ const supabase = supabase.createClient(
 async function signUp() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabaseClient.auth.signUp({ email, password });
   if (error) alert("Fehler bei der Registrierung: " + error.message);
   else alert("Registrierung erfolgreich! Bestätige deine E-Mail.");
 }
@@ -17,23 +17,38 @@ async function signUp() {
 async function signIn() {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) alert("Login fehlgeschlagen: " + error.message);
-  else {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if (error) {
+    alert("Login fehlgeschlagen: " + error.message);
+  } else {
     alert("Erfolgreich eingeloggt!");
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
+    document.getElementById('logout-button').style.display = 'block';
     loadTalentChips();
     loadProfile();
   }
 }
 
+// Abmelden
+async function signOut() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) {
+    alert("Fehler beim Abmelden: " + error.message);
+    return;
+  }
+  alert("Du wurdest abgemeldet.");
+  document.getElementById('auth-section').classList.remove('hidden');
+  document.getElementById('profile-section').classList.add('hidden');
+  document.getElementById('search-section').classList.add('hidden');
+  document.getElementById('logout-button').style.display = 'none';
+}
+
 // Profil speichern
 async function saveProfile() {
-  updateHiddenTalentField(); // sicherstellen, dass Chips synchron sind
+  updateHiddenTalentField();
 
-  const { data: sessionData } = await supabase.auth.getUser();
+  const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
 
   const name = document.getElementById('name').value;
@@ -45,7 +60,7 @@ async function saveProfile() {
     .filter(t => t.length > 0);
   const avatar_url = document.getElementById('avatar_url').value;
 
-  const { error } = await supabase.from('profiles').upsert({
+  const { error } = await supabaseClient.from('profiles').upsert({
     id: user.id,
     name,
     age,
@@ -60,9 +75,13 @@ async function saveProfile() {
 
 // Profil laden
 async function loadProfile() {
-  const { data: sessionData } = await supabase.auth.getUser();
+  const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single();
 
   if (data) {
     document.getElementById('name').value = data.name || '';
@@ -71,17 +90,13 @@ async function loadProfile() {
     document.getElementById('avatar_url').value = data.avatar_url || '';
     previewAvatar();
 
-    const chips = document.querySelectorAll('#chip-container .chip');
     const talents = data.talents || [];
     document.getElementById('talents').value = talents.join(',');
 
+    const chips = document.querySelectorAll('#chip-container .chip');
     chips.forEach(chip => {
       const chipText = chip.textContent.toLowerCase();
-      if (talents.includes(chipText)) {
-        chip.classList.add('active');
-      } else {
-        chip.classList.remove('active');
-      }
+      chip.classList.toggle('active', talents.includes(chipText));
     });
   }
 }
@@ -98,24 +113,108 @@ function previewAvatar() {
   }
 }
 
-// Talente suchen
-async function searchUsers() {
-  const terms = document.getElementById('search-term').value
-    .toLowerCase()
-    .split(',')
-    .map(t => t.trim())
-    .filter(t => t.length > 0);
+// Avatar hochladen
+async function uploadAvatar() {
+  const fileInput = document.getElementById('avatar_file');
+  const file = fileInput.files[0];
+  if (!file) return;
 
-  const { data, error } = await supabase
+  const { data: session } = await supabaseClient.auth.getUser();
+  const userId = session.user.id;
+  const filePath = `${userId}/${file.name}`;
+
+  const { error: uploadError } = await supabaseClient.storage
+    .from('avatars')
+    .upload(filePath, file, { upsert: true });
+
+  if (uploadError) {
+    alert("Fehler beim Hochladen des Bildes: " + uploadError.message);
+    return;
+  }
+
+  const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+  const url = data.publicUrl;
+
+  document.getElementById('avatar_url').value = url;
+  previewAvatar();
+}
+
+// Talente laden
+async function loadTalentChips() {
+  const { data, error } = await supabaseClient
+    .from('talent_tags')
+    .select('*')
+    .order('name');
+  const chipContainer = document.getElementById('chip-container');
+  chipContainer.innerHTML = '';
+
+  if (error) return;
+
+  data.forEach(t => {
+    const chip = document.createElement('div');
+    chip.classList.add('chip');
+    chip.textContent = t.name;
+    chip.onclick = () => toggleTalent(chip);
+    chipContainer.appendChild(chip);
+  });
+
+  updateHiddenTalentField();
+}
+
+// Neues Talent hinzufügen
+async function checkNewTalent(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    const input = document.getElementById('new-talent');
+    const talent = input.value.trim().toLowerCase();
+    input.value = '';
+    if (!talent) return;
+
+    const existing = Array.from(document.querySelectorAll('#chip-container .chip'))
+      .map(chip => chip.textContent.toLowerCase());
+    if (existing.includes(talent)) return;
+
+    const newChip = document.createElement('div');
+    newChip.classList.add('chip', 'active');
+    newChip.textContent = talent;
+    newChip.onclick = () => toggleTalent(newChip);
+    document.getElementById('chip-container').appendChild(newChip);
+
+    try {
+      await supabaseClient.from('talent_tags').insert({ name: talent });
+    } catch (e) {}
+
+    updateHiddenTalentField();
+  }
+}
+
+// Suche
+async function searchUsers() {
+  const term = document.getElementById('search-term').value.trim().toLowerCase();
+  if (!term) {
+    document.getElementById('results').innerText = "Bitte Suchbegriff eingeben.";
+    return;
+  }
+
+  const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
-    .overlaps('talents', terms);
+    .or(`
+      name.ilike.%${term}%,
+      location.ilike.%${term}%,
+      talents.cs.{${term}}
+    `);
 
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
 
-  if (error || !data.length) {
-    resultsDiv.innerText = error ? "Fehler bei der Suche." : "Keine Treffer.";
+  if (error) {
+    resultsDiv.innerText = "Fehler bei der Suche: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    resultsDiv.innerText = "Keine Treffer.";
     return;
   }
 
@@ -143,107 +242,16 @@ function toggleTalent(element) {
   updateHiddenTalentField();
 }
 
-// Talente-Feld aus aktiven Chips aktualisieren
+// Verstecktes Feld für Talente aktualisieren
 function updateHiddenTalentField() {
   const activeChips = Array.from(document.querySelectorAll('.chip.active'))
     .map(c => c.textContent.toLowerCase());
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Neues Talent hinzufügen
-async function checkNewTalent(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    const input = document.getElementById('new-talent');
-    const talent = input.value.trim().toLowerCase();
-    input.value = '';
-    if (!talent) return;
-
-    const existing = Array.from(document.querySelectorAll('#chip-container .chip'))
-      .map(chip => chip.textContent.toLowerCase());
-
-    if (existing.includes(talent)) return;
-
-    const newChip = document.createElement('div');
-    newChip.classList.add('chip', 'active');
-    newChip.textContent = talent;
-    newChip.onclick = () => toggleTalent(newChip);
-    document.getElementById('chip-container').appendChild(newChip);
-
-    try {
-      await supabase.from('talent_tags').insert({ name: talent });
-    } catch (e) {
-      // ignorieren (z. B. Duplikat)
-    }
-
-    updateHiddenTalentField();
-  }
-}
-
-// Avatar-Datei hochladen
-async function uploadAvatar() {
-  const fileInput = document.getElementById('avatar_file');
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  const { data: session } = await supabase.auth.getUser();
-  const userId = session.user.id;
-  const filePath = `${userId}/${file.name}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from('avatars')
-    .upload(filePath, file, { upsert: true });
-
-  if (uploadError) {
-    alert("Fehler beim Hochladen des Bildes: " + uploadError.message);
-    return;
-  }
-
-  const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-  const url = data.publicUrl;
-
-  document.getElementById('avatar_url').value = url;
-  previewAvatar();
-}
-
-// Talente aus DB laden und anzeigen
-async function loadTalentChips() {
-  const { data, error } = await supabase.from('talent_tags').select('*').order('name');
-  const chipContainer = document.getElementById('chip-container');
-  chipContainer.innerHTML = '';
-
-  if (error) return;
-
-  data.forEach(t => {
-    const chip = document.createElement('div');
-    chip.classList.add('chip');
-    chip.textContent = t.name;
-    chip.onclick = () => toggleTalent(chip);
-    chipContainer.appendChild(chip);
-  });
-
-  updateHiddenTalentField(); // initial synchronisieren
-  // Benutzer abmelden
-async function signOut() {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    alert("Fehler beim Abmelden: " + error.message);
-    return;
-  }
-
-  // Nutzer erfolgreich abgemeldet
-  alert("Du wurdest abgemeldet.");
-
-  // Sichtbarkeit der Sektionen anpassen:
-  document.getElementById('auth-section').classList.remove('hidden');    // Anmeldebereich anzeigen
-  document.getElementById('profile-section').classList.add('hidden');    // Profilbereich ausblenden
-  document.getElementById('search-section').classList.add('hidden');     // Suchbereich ausblenden (falls offen)
-
-  // Logout-Button verstecken
-  document.getElementById('logout-button').style.display = 'none';
-}
+// Beim Laden prüfen, ob Nutzer eingeloggt ist
 window.addEventListener('load', async () => {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
@@ -256,61 +264,13 @@ window.addEventListener('load', async () => {
     document.getElementById('logout-button').style.display = 'none';
   }
 });
+
+// Globale Zuweisung für HTML onclick-Zugriffe
+window.signIn = signIn;
+window.signUp = signUp;
 window.signOut = signOut;
-
-async function searchUsers() {
-  const term = document.getElementById('search-term').value.trim().toLowerCase();
-  if (!term) {
-    document.getElementById('results').innerText = "Bitte Suchbegriff eingeben.";
-    return;
-  }
-
-  // Suche in name, location oder Talente (als Text)
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .or(`
-      name.ilike.%${term}%,
-      location.ilike.%${term}%,
-      talents.cs.{${term}}  -- falls talents ein Array ist und du exakten Match willst
-    `);
-
-  const resultsDiv = document.getElementById('results');
-  resultsDiv.innerHTML = '';
-
-  if (error) {
-    resultsDiv.innerText = "Fehler bei der Suche: " + error.message;
-    return;
-  }
-
-  if (!data.length) {
-    resultsDiv.innerText = "Keine Treffer.";
-    return;
-  }
-
-  data.forEach(user => {
-    const div = document.createElement('div');
-    div.classList.add('result-card');
-    div.innerHTML = `
-      <img src="${user.avatar_url}" alt="Avatar" width="60" style="border-radius: 50%">
-      <strong>${user.name}</strong> (${user.age}), ${user.location}<br>
-      <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
-    `;
-    resultsDiv.appendChild(div);
-  });async function signIn() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  console.log("Login mit:", email, password);
-
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    alert("Login fehlgeschlagen: " + error.message);
-    console.error("Supabase-Fehler:", error);
-  } else {
-    alert("Erfolgreich eingeloggt!");
-    console.log("Login-Daten:", data);
-    // hier deinen Code zum Wechseln der Ansicht usw.
-  }
-}
-
-}
+window.saveProfile = saveProfile;
+window.uploadAvatar = uploadAvatar;
+window.checkNewTalent = checkNewTalent;
+window.toggleSearch = toggleSearch;
+window.searchUsers = searchUsers;
