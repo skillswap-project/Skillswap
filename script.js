@@ -241,6 +241,20 @@ async function signOut() {
   // Logout-Button verstecken
   document.getElementById('logout-button').style.display = 'none';
 }
+window.addEventListener('load', async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    document.getElementById('auth-section').classList.add('hidden');
+    document.getElementById('profile-section').classList.remove('hidden');
+    document.getElementById('logout-button').style.display = 'block';
+    loadTalentChips();
+    loadProfile();
+  } else {
+    document.getElementById('auth-section').classList.remove('hidden');
+    document.getElementById('profile-section').classList.add('hidden');
+    document.getElementById('logout-button').style.display = 'none';
+  }
+});
 
 
 }
