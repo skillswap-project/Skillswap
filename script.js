@@ -257,5 +257,46 @@ window.addEventListener('load', async () => {
 });
 window.signOut = signOut;
 
+async function searchUsers() {
+  const term = document.getElementById('search-term').value.trim().toLowerCase();
+  if (!term) {
+    document.getElementById('results').innerText = "Bitte Suchbegriff eingeben.";
+    return;
+  }
+
+  // Suche in name, location oder Talente (als Text)
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .or(`
+      name.ilike.%${term}%,
+      location.ilike.%${term}%,
+      talents.cs.{${term}}  -- falls talents ein Array ist und du exakten Match willst
+    `);
+
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = '';
+
+  if (error) {
+    resultsDiv.innerText = "Fehler bei der Suche: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    resultsDiv.innerText = "Keine Treffer.";
+    return;
+  }
+
+  data.forEach(user => {
+    const div = document.createElement('div');
+    div.classList.add('result-card');
+    div.innerHTML = `
+      <img src="${user.avatar_url}" alt="Avatar" width="60" style="border-radius: 50%">
+      <strong>${user.name}</strong> (${user.age}), ${user.location}<br>
+      <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
+    `;
+    resultsDiv.appendChild(div);
+  });
+}
 
 }
