@@ -1,7 +1,7 @@
 const { createClient } = supabase;
 const supabaseClient = createClient(
- 'https://jdabagmcyxjjrknqrgkh.supabase.co',
- 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
+  'https://jdabagmcyxjjrknqrgkh.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
 );
 
 // Registrierung
@@ -177,7 +177,7 @@ async function searchUsers() {
   const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
-    .or(`name.ilike.%${term}%,location.ilike.%${term}%,talents.cs.["${term}"]`);
+    .or(`name.ilike.%${term}%,location.ilike.%${term}%,talents.ilike.%${term}%`);
 
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
@@ -204,7 +204,7 @@ async function searchUsers() {
   });
 }
 
-// UI-Handling
+// UI & Event Handling
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
@@ -220,7 +220,7 @@ function updateHiddenTalentField() {
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// On Load
+// Initialisierung bei Seitenaufruf
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
@@ -236,7 +236,7 @@ window.addEventListener('load', async () => {
   }
 });
 
-// Für HTML-Zugriffe
+// Globale Funktionen für HTML
 window.signIn = signIn;
 window.signUp = signUp;
 window.signOut = signOut;
