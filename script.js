@@ -166,7 +166,7 @@ async function checkNewTalent(event) {
   }
 }
 
-// Suche
+// Suche mit PostgreSQL-Array-Syntax
 async function searchUsers() {
   const term = document.getElementById('search-term').value.trim().toLowerCase();
   if (!term) {
@@ -177,7 +177,7 @@ async function searchUsers() {
   const { data, error } = await supabaseClient
     .from('profiles')
     .select('*')
-    .or(`name.ilike.%${term}%,location.ilike.%${term}%,talents.ilike.%${term}%`);
+    .or(`name.ilike.%${term}%,location.ilike.%${term}%,talents.cs.{${term}}`);
 
   const resultsDiv = document.getElementById('results');
   resultsDiv.innerHTML = '';
@@ -204,7 +204,7 @@ async function searchUsers() {
   });
 }
 
-// UI & Event Handling
+// UI
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
@@ -220,7 +220,7 @@ function updateHiddenTalentField() {
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Initialisierung bei Seitenaufruf
+// Beim Laden prüfen ob User eingeloggt ist
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
@@ -236,7 +236,7 @@ window.addEventListener('load', async () => {
   }
 });
 
-// Globale Funktionen für HTML
+// HTML-kompatible Funktionszuweisung
 window.signIn = signIn;
 window.signUp = signUp;
 window.signOut = signOut;
