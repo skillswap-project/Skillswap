@@ -298,5 +298,17 @@ async function searchUsers() {
     resultsDiv.appendChild(div);
   });
 }
+data.forEach(user => {
+  const div = document.createElement('div');
+  div.classList.add('result-card');
+  div.innerHTML = `
+    <img src="${user.avatar_url}" alt="Avatar" width="60" style="border-radius: 50%">
+    <a href="chat.html?userId=${user.id}" class="profile-link">
+      <strong>${user.name}</strong> (${user.age}), ${user.location}
+    </a><br>
+    <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
+  `;
+  resultsDiv.appendChild(div);
+});
 
 }
