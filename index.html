@@ -4,8 +4,10 @@
   <meta charset="UTF-8">
   <title>SkillSwap</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
   <header>
     <img src="logo.png" alt="SkillSwap Logo" class="logo">
     <h1>SkillSwap</h1>
@@ -59,65 +61,12 @@
     </section>
   </main>
 
-  <!-- Supabase & JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="script.js"></script>
-</body>
-</html>
-<div style="position: absolute; top: 10px; right: 10px;">
-  <button onclick="signOut()">Abmelden</button>
-</div>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <title>Test Logout</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-</head>
-<body>
-
-  <div id="profile-section" class="hidden">Profil hier</div>
-
+  <!-- Logout Button -->
   <div id="logout-button" style="position: absolute; top: 10px; right: 10px; display: none;">
     <button onclick="signOut()">Abmelden</button>
   </div>
 
-  <script>
-    const supabase = supabase.createClient('https://...supabase.co', 'public-anon-key');
-
-    window.signOut = async function() {
-      const { error } = await supabase.auth.signOut();
-      console.log("Logout error:", error);
-      if (error) {
-        alert("Fehler beim Abmelden: " + error.message);
-        return;
-      }
-      alert("Du wurdest abgemeldet.");
-      document.getElementById('auth-section').classList.remove('hidden');
-      document.getElementById('profile-section').classList.add('hidden');
-      document.getElementById('logout-button').style.display = 'none';
-    }
-
-    // Dummy Login simulieren:
-    function fakeLogin() {
-      document.getElementById('auth-section').classList.add('hidden');
-      document.getElementById('profile-section').classList.remove('hidden');
-      document.getElementById('logout-button').style.display = 'block';
-    }
-
-    window.onload = () => {
-      // Für Testzwecke: Simuliere eingeloggt
-      fakeLogin();
-    }
-  </script>
-
-  <style>
-    .hidden { display: none; }
-  </style>
-
+  <!-- Dein JS -->
+  <script src="script.js"></script>
 </body>
 </html>
-<div id="logout-button" style="position: absolute; top: 10px; right: 10px; display: none;">
-  <button onclick="signOut()">Abmelden</button>
-</div>
-
