@@ -296,7 +296,8 @@ async function searchUsers() {
       <div>${user.talents.map(t => `<span class="talent-tag">${t}</span>`).join(' ')}</div>
     `;
     resultsDiv.appendChild(div);
-  });
+  });chat.html?userId=abcd1234
+
 }
 data.forEach(user => {
   const div = document.createElement('div');
@@ -310,5 +311,9 @@ data.forEach(user => {
   `;
   resultsDiv.appendChild(div);
 });
+const urlParams = new URLSearchParams(window.location.search);
+const otherUserId = urlParams.get('userId');
+
+// Jetzt mit `otherUserId` den Chat laden, Nachrichten abrufen etc.
 
 }
