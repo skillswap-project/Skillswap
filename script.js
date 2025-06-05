@@ -222,4 +222,18 @@ async function loadTalentChips() {
   });
 
   updateHiddenTalentField(); // initial synchronisieren
+  // Benutzer abmelden
+async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    alert("Fehler beim Abmelden: " + error.message);
+    return;
+  }
+
+  alert("Du wurdest abgemeldet.");
+  document.getElementById('auth-section').classList.remove('hidden');
+  document.getElementById('profile-section').classList.add('hidden');
+  document.getElementById('search-section').classList.add('hidden');
+}
+
 }
