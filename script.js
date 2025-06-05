@@ -51,7 +51,10 @@ async function saveProfile() {
   const name = document.getElementById('name').value;
   const age = parseInt(document.getElementById('age').value);
   const location = document.getElementById('location').value;
-  const talents = document.getElementById('talents').value.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
+  const talents = document.getElementById('talents').value
+    .split(',')
+    .map(t => t.trim().toLowerCase())
+    .filter(t => t.length > 0);
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabaseClient.from('profiles').upsert({
@@ -71,13 +74,19 @@ async function saveProfile() {
 async function loadProfile() {
   const { data: sessionData } = await supabaseClient.auth.getUser();
   const user = sessionData.user;
-  const { data, error } = await supabaseClient.from('profiles').select('*').eq('id', user.id).single();
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
   if (data) {
     document.getElementById('name').value = data.name || '';
     document.getElementById('age').value = data.age || '';
     document.getElementById('location').value = data.location || '';
     document.getElementById('avatar_url').value = data.avatar_url || '';
     previewAvatar();
+
     const talents = data.talents || [];
     document.getElementById('talents').value = talents.join(',');
     const chips = document.querySelectorAll('#chip-container .chip');
@@ -87,6 +96,7 @@ async function loadProfile() {
     });
   }
 }
+
 // Avatar-Vorschau
 function previewAvatar() {
   const url = document.getElementById('avatar_url').value;
@@ -98,19 +108,22 @@ function previewAvatar() {
     img.classList.add('hidden');
   }
 }
-
 // Avatar hochladen
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
   const file = fileInput.files[0];
   if (!file) return;
+
   const { data: session } = await supabaseClient.auth.getUser();
   const userId = session.user.id;
   const filePath = `${userId}/${file.name}`;
 
-  const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file, { upsert: true });
+  const { error: uploadError } = await supabaseClient
+    .storage.from('avatars')
+    .upload(filePath, file, { upsert: true });
+
   if (uploadError) {
-    alert("Fehler beim Hochladen des Bildes: " + uploadError.message);
+    alert("Fehler beim Hochladen: " + uploadError.message);
     return;
   }
 
@@ -122,7 +135,11 @@ async function uploadAvatar() {
 
 // Talente laden
 async function loadTalentChips() {
-  const { data, error } = await supabaseClient.from('talent_tags').select('*').order('name');
+  const { data, error } = await supabaseClient
+    .from('talent_tags')
+    .select('*')
+    .order('name');
+
   const chipContainer = document.getElementById('chip-container');
   chipContainer.innerHTML = '';
   if (error) return;
@@ -163,7 +180,7 @@ async function checkNewTalent(event) {
     updateHiddenTalentField();
   }
 }
-// Suche mit PostgreSQL-Array-Syntax
+// Suche
 async function searchUsers() {
   const term = document.getElementById('search-term').value.trim().toLowerCase();
   if (!term) {
@@ -202,7 +219,7 @@ async function searchUsers() {
   });
 }
 
-// Modal öffnen
+// Nachricht senden & Modal
 let selectedRecipientId = null;
 
 function openMessageModal(userId, userName) {
@@ -217,7 +234,6 @@ function closeMessageModal() {
   document.getElementById('message-text').value = '';
 }
 
-// Nachricht senden
 async function sendMessage() {
   const content = document.getElementById('message-text').value.trim();
   if (!content || !selectedRecipientId) return;
@@ -236,7 +252,8 @@ async function sendMessage() {
     closeMessageModal();
   }
 }
-// UI
+
+// UI-Helfer
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
@@ -252,7 +269,7 @@ function updateHiddenTalentField() {
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Beim Laden prüfen, ob User eingeloggt ist
+// Automatisch prüfen, ob bereits eingeloggt
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
@@ -268,15 +285,17 @@ window.addEventListener('load', async () => {
   }
 });
 
-// Globale Funktionen für onclick in HTML
-window.signIn = signIn;
+// Globale Verfügbarkeit im HTML
 window.signUp = signUp;
+window.signIn = signIn;
 window.signOut = signOut;
 window.saveProfile = saveProfile;
+window.loadProfile = loadProfile;
 window.uploadAvatar = uploadAvatar;
+window.loadTalentChips = loadTalentChips;
 window.checkNewTalent = checkNewTalent;
-window.toggleSearch = toggleSearch;
 window.searchUsers = searchUsers;
 window.sendMessage = sendMessage;
 window.openMessageModal = openMessageModal;
 window.closeMessageModal = closeMessageModal;
+window.toggleSearch = toggleSearch;
