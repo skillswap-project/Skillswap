@@ -255,6 +255,7 @@ window.addEventListener('load', async () => {
     document.getElementById('logout-button').style.display = 'none';
   }
 });
+window.signOut = signOut;
 
 
 }
