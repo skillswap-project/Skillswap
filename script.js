@@ -25,8 +25,10 @@ async function signIn() {
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
     document.getElementById('logout-button').style.display = 'block';
+    document.getElementById('messages-section').classList.remove('hidden');
     loadTalentChips();
     loadProfile();
+    loadReceivedMessages();
   }
 }
 
@@ -41,8 +43,10 @@ async function signOut() {
   document.getElementById('auth-section').classList.remove('hidden');
   document.getElementById('profile-section').classList.add('hidden');
   document.getElementById('search-section').classList.add('hidden');
+  document.getElementById('messages-section').classList.add('hidden');
   document.getElementById('logout-button').style.display = 'none';
 }
+
 // Profil speichern
 async function saveProfile() {
   updateHiddenTalentField();
@@ -59,7 +63,7 @@ async function saveProfile() {
   const avatar_url = document.getElementById('avatar_url').value;
 
   const { error } = await supabaseClient.from('profiles').upsert({
-    id: user.id, // ✅ sorgt dafür, dass jeder User genau ein eigenes Profil hat
+    id: user.id,
     name,
     age,
     location,
@@ -71,7 +75,6 @@ async function saveProfile() {
   else alert("Profil gespeichert!");
 }
 
-
 // Profil laden
 async function loadProfile() {
   const { data: sessionData } = await supabaseClient.auth.getUser();
@@ -81,7 +84,7 @@ async function loadProfile() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .maybeSingle(); // ✅ kein 406-Fehler, wenn kein Datensatz
+    .maybeSingle();
 
   if (data) {
     document.getElementById('name').value = data.name || '';
@@ -98,7 +101,6 @@ async function loadProfile() {
       chip.classList.toggle('active', talents.includes(chipText));
     });
   } else {
-    // Neues Profil – Felder leer lassen
     document.getElementById('name').value = '';
     document.getElementById('age').value = '';
     document.getElementById('location').value = '';
@@ -107,7 +109,6 @@ async function loadProfile() {
     document.getElementById('talents').value = '';
   }
 }
-
 
 // Avatar-Vorschau
 function previewAvatar() {
@@ -120,6 +121,7 @@ function previewAvatar() {
     img.classList.add('hidden');
   }
 }
+
 // Avatar hochladen
 async function uploadAvatar() {
   const fileInput = document.getElementById('avatar_file');
@@ -192,6 +194,7 @@ async function checkNewTalent(event) {
     updateHiddenTalentField();
   }
 }
+
 // Suche
 async function searchUsers() {
   const term = document.getElementById('search-term').value.trim().toLowerCase();
@@ -231,7 +234,44 @@ async function searchUsers() {
   });
 }
 
-// Nachricht senden & Modal
+// Nachrichten lesen
+async function loadReceivedMessages() {
+  const { data: { user } } = await supabaseClient.auth.getUser();
+  if (!user) return;
+
+  const { data: messages, error } = await supabaseClient
+    .from('messages')
+    .select('*, sender:profiles(name)')
+    .eq('receiver_id', user.id)
+    .order('created_at', { ascending: false });
+
+  const container = document.getElementById('received-messages');
+  container.innerHTML = '';
+
+  if (error) {
+    container.innerText = "Fehler beim Laden der Nachrichten: " + error.message;
+    return;
+  }
+
+  if (!messages.length) {
+    container.innerText = "Keine empfangenen Nachrichten.";
+    return;
+  }
+
+  messages.forEach(msg => {
+    const div = document.createElement('div');
+    div.classList.add('message');
+    div.innerHTML = `
+      <p><strong>Von:</strong> ${msg.sender?.name || 'Unbekannt'}</p>
+      <p>${msg.content}</p>
+      <small>${new Date(msg.created_at).toLocaleString()}</small>
+      <hr />
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Nachricht senden
 let selectedRecipientId = null;
 
 function openMessageModal(userId, userName) {
@@ -265,7 +305,7 @@ async function sendMessage() {
   }
 }
 
-// UI-Helfer
+// UI
 function toggleSearch() {
   document.getElementById('profile-section').classList.toggle('hidden');
   document.getElementById('search-section').classList.toggle('hidden');
@@ -281,23 +321,26 @@ function updateHiddenTalentField() {
   document.getElementById('talents').value = activeChips.join(',');
 }
 
-// Automatisch prüfen, ob bereits eingeloggt
+// Auto-Login prüfen
 window.addEventListener('load', async () => {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
     document.getElementById('auth-section').classList.add('hidden');
     document.getElementById('profile-section').classList.remove('hidden');
+    document.getElementById('messages-section').classList.remove('hidden');
     document.getElementById('logout-button').style.display = 'block';
     loadTalentChips();
     loadProfile();
+    loadReceivedMessages();
   } else {
     document.getElementById('auth-section').classList.remove('hidden');
     document.getElementById('profile-section').classList.add('hidden');
+    document.getElementById('messages-section').classList.add('hidden');
     document.getElementById('logout-button').style.display = 'none';
   }
 });
 
-// Globale Verfügbarkeit im HTML
+// Funktionen global verfügbar machen
 window.signUp = signUp;
 window.signIn = signIn;
 window.signOut = signOut;
@@ -311,3 +354,4 @@ window.sendMessage = sendMessage;
 window.openMessageModal = openMessageModal;
 window.closeMessageModal = closeMessageModal;
 window.toggleSearch = toggleSearch;
+window.loadReceivedMessages = loadReceivedMessages;
