@@ -1,72 +1,72 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>SkillSwap</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <header>
-    <img src="logo.png" alt="SkillSwap Logo" class="logo">
-    <h1>SkillSwap</h1>
-  </header>
+<header>
+  <img src="logo.png" alt="SkillSwap Logo" class="logo" />
+  <h1>SkillSwap</h1>
+</header>
 
-  <main>
-    <!-- LOGIN -->
-    <section id="auth-section">
-      <h2>Anmelden / Registrieren</h2>
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Passwort">
-      <button onclick="signUp()">Registrieren</button>
-      <button onclick="signIn()">Anmelden</button>
-    </section>
+<main>
+  <!-- LOGIN -->
+  <section id="auth-section">
+    <h2>Anmelden / Registrieren</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Passwort" />
+    <button onclick="signUp()">Registrieren</button>
+    <button onclick="signIn()">Anmelden</button>
+  </section>
 
-    <!-- PROFIL -->
-    <section id="profile-section" class="hidden">
-      <h2>Dein Profil</h2>
+  <!-- PROFIL -->
+  <section id="profile-section" class="hidden">
+    <h2>Dein Profil</h2>
+    <img id="avatar-preview" class="avatar-preview hidden" />
+    <input type="file" id="avatar_file" accept="image/*" onchange="uploadAvatar()" />
+    <input type="hidden" id="avatar_url" />
+    <input type="text" id="name" placeholder="Name" />
+    <input type="number" id="age" placeholder="Alter" />
+    <input type="text" id="location" placeholder="Ort" />
+    <div id="talent-options">
+      <p>Wähle deine Talente oder füge neue hinzu:</p>
+      <div id="chip-container"></div>
+      <input type="text" id="new-talent" placeholder="Neues Talent eingeben" onkeydown="checkNewTalent(event)" />
+    </div>
+    <input type="hidden" id="talents" />
+    <button onclick="saveProfile()">Profil speichern</button>
+    <button onclick="toggleSearch()">Talente suchen</button>
+  </section>
 
-      <!-- Avatar-Vorschau -->
-      <img id="avatar-preview" class="avatar-preview hidden" />
+  <!-- SUCHE -->
+  <section id="search-section" class="hidden">
+    <h2>Talente finden</h2>
+    <input type="text" id="search-term" placeholder="z.B. Mathe" />
+    <button onclick="searchUsers()">Suchen</button>
+    <div id="results"></div>
+    <button onclick="toggleSearch()">Zurück zum Profil</button>
+  </section>
 
-      <!-- Avatar-Upload -->
-      <input type="file" id="avatar_file" accept="image/*" onchange="uploadAvatar()" />
-      <input type="hidden" id="avatar_url" />
-
-      <!-- Persönliche Angaben -->
-      <input type="text" id="name" placeholder="Name">
-      <input type="number" id="age" placeholder="Alter">
-      <input type="text" id="location" placeholder="Ort">
-
-      <!-- Talente-Auswahl -->
-      <div id="talent-options">
-        <p>Wähle deine Talente oder füge neue hinzu:</p>
-        <div id="chip-container"></div>
-        <input type="text" id="new-talent" placeholder="Neues Talent eingeben" onkeydown="checkNewTalent(event)">
-      </div>
-      <input type="hidden" id="talents" />
-
-      <button onclick="saveProfile()">Profil speichern</button>
-      <button onclick="toggleSearch()">Talente suchen</button>
-    </section>
-
-    <!-- SUCHE -->
-    <section id="search-section" class="hidden">
-      <h2>Talente finden</h2>
-      <input type="text" id="search-term" placeholder="z.B. Mathe">
-      <button onclick="searchUsers()">Suchen</button>
-      <div id="results"></div>
-      <button onclick="toggleSearch()">Zurück zum Profil</button>
-    </section>
-  </main>
-
-  <!-- Logout Button -->
-  <div id="logout-button" style="position: absolute; top: 10px; right: 10px; display: none;">
-    <button onclick="signOut()">Abmelden</button>
+  <!-- NACHRICHTENMODAL -->
+  <div id="message-modal" class="hidden modal-overlay">
+    <div class="modal-content">
+      <h3>Nachricht an <span id="message-recipient-name"></span></h3>
+      <textarea id="message-text" placeholder="Deine Nachricht..."></textarea>
+      <button onclick="sendMessage()">Senden</button>
+      <button onclick="closeMessageModal()">Abbrechen</button>
+    </div>
   </div>
+</main>
 
-  <!-- Dein JS -->
-  <script src="script.js"></script>
+<!-- Logout -->
+<div id="logout-button" style="position: absolute; top: 10px; right: 10px; display: none;">
+  <button onclick="signOut()">Abmelden</button>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
