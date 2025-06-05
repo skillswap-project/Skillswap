@@ -1,4 +1,4 @@
-const supabase = supabase.createClient('https://xxx.supabase.co', 'public-anon-key');
+const supabase = window.supabase.createClient( 
 
   'https://jdabagmcyxjjrknqrgkh.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpkYWJhZ21jeXhqanJrbnFyZ2toIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4NjMxMDAsImV4cCI6MjA2MzQzOTEwMH0.MRmKYrl9BWwKwNwqenGV_Lvrtci7BO59GhxLQWd3a3A'
